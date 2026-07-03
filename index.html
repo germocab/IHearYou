@@ -53,6 +53,8 @@
 
 html, body{
   margin:0; padding:0; height:100%;
+  height: 100dvh;
+  overflow: hidden;
   background: var(--color-surface);
   color: var(--color-text);
   font-family: var(--font-body);
@@ -71,20 +73,21 @@ a{ color:inherit; }
 /* ==========================================================
    PÁGINAS (SPA) — solo una visible a la vez
 ========================================================== */
-.page{ display:none; width:100%; }
-.page.active{ display:flex; justify-content:center; }
+.page{ display:none; width:100%; height:100%; }
+.page.active{ display:flex; justify-content:center; height:100%; }
 
 /* Contenedor "teléfono": limita el ancho en pantallas grandes
    mientras mantiene el look de app móvil en el dispositivo real. */
 .app-shell{
   width:100%;
   max-width: 460px;
-  min-height: 100vh;
+  height: 100%;
   background: var(--color-bg);
   display:flex;
   flex-direction:column;
   position:relative;
   overflow-x:hidden;
+  overflow-y:auto;
 }
 
 /* ==========================================================
@@ -325,13 +328,67 @@ a{ color:inherit; }
 }
 
 /* ==========================================================
+   PANTALLA DE RESULTADO POR PREGUNTA (Bien hecho / Ups)
+========================================================== */
+.result-screen{
+  flex:1;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  padding: 20px 24px 30px;
+  gap:4px;
+  animation: resultFadeIn .28s ease;
+}
+@keyframes resultFadeIn{
+  0%{ opacity:0; transform: translateY(10px); }
+  100%{ opacity:1; transform: translateY(0); }
+}
+.result-emoji{
+  font-size:52px;
+  margin-bottom:6px;
+  animation: trophyPop .5s cubic-bezier(.34,1.56,.64,1);
+}
+.result-title{
+  font-family: var(--font-display);
+  font-size:22px;
+  margin:0 0 4px;
+}
+.result-screen.is-correct .result-title{ color: var(--color-success); }
+.result-screen.is-incorrect .result-title{ color: var(--color-error); }
+.result-sub{
+  color: var(--color-text-muted);
+  font-size:14px;
+  margin: 0 0 14px;
+  max-width: 300px;
+}
+.result-points-earned{
+  font-family: var(--font-display);
+  font-weight:800;
+  font-size:28px;
+  color: var(--color-success);
+  margin-bottom: 6px;
+}
+.result-points-earned.zero{ color: var(--color-text-muted); }
+.result-total{
+  font-size:13px;
+  color: var(--color-text-muted);
+  margin-bottom: 26px;
+}
+.result-total strong{ color: var(--color-primary); }
+.result-screen .btn{ width:100%; max-width:280px; }
+
+/* ==========================================================
    CONTENIDO
 ========================================================== */
 .screen-content{
   flex:1;
+  min-height:0;
   display:flex;
   flex-direction:column;
   padding: 6px 20px 24px;
+  overflow-y:auto;
 }
 
 .activity-header{
@@ -1158,9 +1215,8 @@ a{ color:inherit; }
   // LÓGICA DE LA ACTIVIDAD "¿QUÉ VEO?"
   // ============================================================
   const ActivityScreen = (() => {
-    const TOTAL_QUESTIONS = 5;
+    const DEFAULT_TOTAL_QUESTIONS = 5;
     const POINTS_PER_QUESTION = 10;
-    const STREAK_BONUS = 2; // puntos extra por cada acierto consecutivo a partir del 2º
 
     const state = {
       currentExercise: null,
@@ -1171,9 +1227,10 @@ a{ color:inherit; }
       totalCount: 0,
       currentAudio: null,
       initialized: false,
-      questionIndex: 0,   // 0-based, pregunta actual dentro de la sesión
-      score: 0,            // puntos acumulados en la sesión
-      streak: 0,           // aciertos consecutivos
+      questionIndex: 0,      // 0-based, pregunta actual dentro de la sesión
+      totalQuestions: DEFAULT_TOTAL_QUESTIONS, // se ajusta según ejercicios disponibles
+      score: 0,               // puntos acumulados en la sesión
+      streak: 0,              // aciertos consecutivos
     };
 
     const els = {
@@ -1188,7 +1245,7 @@ a{ color:inherit; }
     };
 
     // Se llama cada vez que se entra a la pantalla de actividad.
-    function enter() {
+    async function enter() {
       // Reinicia la sesión de juego cada vez que se abre la actividad.
       state.questionIndex = 0;
       state.score = 0;
@@ -1196,13 +1253,28 @@ a{ color:inherit; }
       state.correctCount = 0;
       state.totalCount = 0;
       state.lastExerciseId = null;
+      state.totalQuestions = DEFAULT_TOTAL_QUESTIONS;
       updateScoreDisplay(false);
       updateStreakDisplay();
+
+      renderLoading();
+
+      // La cantidad total de preguntas (y por lo tanto el puntaje máximo)
+      // depende de cuántos ejercicios utilizables existan en este momento.
+      try {
+        const exercises = await DataService.getExercises(ACTIVITY_TYPES.QUE_VEO);
+        const usable = exercises.filter(e => e.exercise_audios && e.exercise_audios.length >= 2);
+        state.totalQuestions = usable.length > 0 ? usable.length : DEFAULT_TOTAL_QUESTIONS;
+      } catch (err) {
+        console.error(err);
+        // Si falla, seguimos con el valor por defecto.
+      }
+
       loadNextExercise();
     }
 
     async function loadNextExercise() {
-      if (state.questionIndex >= TOTAL_QUESTIONS) {
+      if (state.questionIndex >= state.totalQuestions) {
         renderComplete();
         return;
       }
@@ -1210,8 +1282,8 @@ a{ color:inherit; }
       state.answered = false;
       state.selectedIndex = null;
       els.pointsBadge.style.display = 'none';
-      els.questionCounter.textContent = `Pregunta ${state.questionIndex + 1} de ${TOTAL_QUESTIONS}`;
-      updateProgress((state.questionIndex / TOTAL_QUESTIONS) * 100);
+      els.questionCounter.textContent = `Pregunta ${state.questionIndex + 1} de ${state.totalQuestions}`;
+      updateProgress((state.questionIndex / state.totalQuestions) * 100);
       renderLoading();
 
       try {
@@ -1388,7 +1460,7 @@ a{ color:inherit; }
       state.totalCount++;
       if (isCorrect) state.correctCount++;
 
-      updateProgress(((state.questionIndex + 1) / TOTAL_QUESTIONS) * 100);
+      updateProgress(((state.questionIndex + 1) / state.totalQuestions) * 100);
 
       document.querySelectorAll('.audio-option').forEach(btn => {
         if (btn !== selectedBtn) {
@@ -1402,11 +1474,11 @@ a{ color:inherit; }
       const banner = document.getElementById('feedbackBanner');
       const caption = document.getElementById('feedbackCaption');
       const imageCard = document.querySelector('.image-card');
+      let earned = 0;
 
       if (isCorrect) {
         state.streak++;
-        const bonus = state.streak > 1 ? STREAK_BONUS * (state.streak - 1) : 0;
-        const earned = POINTS_PER_QUESTION + bonus;
+        earned = POINTS_PER_QUESTION;
         state.score += earned;
 
         banner.className = 'feedback-banner correct show';
@@ -1415,7 +1487,7 @@ a{ color:inherit; }
         caption.textContent = exercise.title ? `Esta es ${exercise.title}` : '¡Muy bien!';
 
         els.pointsBadge.style.display = 'block';
-        els.pointsBadge.textContent = bonus > 0 ? `+${earned} puntos (racha x${state.streak})` : `+${earned} puntos`;
+        els.pointsBadge.textContent = `+${earned} puntos`;
 
         if (imageCard) imageCard.classList.add('celebrate');
         showFloatingPoints(earned, imageCard);
@@ -1429,8 +1501,10 @@ a{ color:inherit; }
         updateStreakDisplay();
       }
 
-      state.questionIndex++;
-      setTimeout(loadNextExercise, 1700);
+      // Espera un instante para que se vea la selección resaltada y el
+      // efecto de celebración, y luego muestra la pantalla de resultado
+      // con un botón explícito para continuar (sin transiciones bruscas).
+      setTimeout(() => renderResultScreen(isCorrect, earned, exercise), 900);
     }
 
     function updateProgress(pct) {
@@ -1481,11 +1555,40 @@ a{ color:inherit; }
       }
     }
 
+    function renderResultScreen(isCorrect, earned, exercise) {
+      const isLastQuestion = state.questionIndex + 1 >= state.totalQuestions;
+      const nextLabel = isLastQuestion ? 'Ver resultados' : 'Siguiente pregunta';
+      const title = isCorrect ? '¡Bien hecho!' : 'Ups, no era eso';
+      const emoji = isCorrect ? '🎉' : '💭';
+      const sub = isCorrect
+        ? (exercise.title ? `Era ${exercise.title}. ¡Buen oído!` : '¡Identificaste el sonido correcto!')
+        : 'No pasa nada, sigue intentando en la próxima pregunta.';
+      const pointsLine = isCorrect
+        ? `<div class="result-points-earned">+${earned} puntos</div>`
+        : `<div class="result-points-earned zero">+0 puntos</div>`;
+
+      els.content.innerHTML = `
+        <div class="result-screen ${isCorrect ? 'is-correct' : 'is-incorrect'}">
+          <div class="result-emoji">${emoji}</div>
+          <h2 class="result-title">${title}</h2>
+          <p class="result-sub">${sub}</p>
+          ${pointsLine}
+          <div class="result-total">Puntaje total: <strong>${state.score}</strong> pts</div>
+          <button class="btn btn-primary" id="btnNextQuestion">${nextLabel}</button>
+        </div>
+      `;
+
+      document.getElementById('btnNextQuestion').addEventListener('click', () => {
+        state.questionIndex++;
+        loadNextExercise();
+      });
+    }
+
     function renderComplete() {
-      const total = TOTAL_QUESTIONS;
+      const total = state.totalQuestions;
       const correct = state.correctCount;
       const maxScore = POINTS_PER_QUESTION * total;
-      const ratio = correct / total;
+      const ratio = total > 0 ? correct / total : 0;
 
       let starsCount = 1;
       if (ratio >= 1) starsCount = 3;
