@@ -371,12 +371,7 @@ a{ color:inherit; }
   margin-bottom: 6px;
 }
 .result-points-earned.zero{ color: var(--color-text-muted); }
-.result-total{
-  font-size:13px;
-  color: var(--color-text-muted);
-  margin-bottom: 26px;
-}
-.result-total strong{ color: var(--color-primary); }
+
 .result-screen .btn{ width:100%; max-width:280px; }
 
 /* ==========================================================
@@ -1573,7 +1568,7 @@ a{ color:inherit; }
           <h2 class="result-title">${title}</h2>
           <p class="result-sub">${sub}</p>
           ${pointsLine}
-          <div class="result-total">Puntaje total: <strong>${state.score}</strong> pts</div>
+          
           <button class="btn btn-primary" id="btnNextQuestion">${nextLabel}</button>
         </div>
       `;
