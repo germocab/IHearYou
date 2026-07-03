@@ -758,6 +758,7 @@ a{ color:inherit; }
             <label>Alternativas de audio</label>
             <div id="audioInputsContainer"></div>
             <button class="btn btn-secondary" id="btnAddAudio" type="button" style="margin-top:6px;">+ Agregar alternativa</button>
+            <div class="hint" style="margin-top:8px;">Formatos compatibles: MP3, M4A, WAV, OGG. Si un audio no suena tras subirlo, vuelve a subirlo (los archivos cargados antes de esta actualización pueden haber quedado con el formato mal etiquetado).</div>
           </div>
 
           <div class="progress-bar-upload" id="uploadProgress"><div class="fill" id="uploadProgressFill"></div></div>
@@ -887,14 +888,46 @@ a{ color:inherit; }
     async uploadFile(bucket, file) {
       const ext = file.name.split('.').pop();
       const path = `${crypto.randomUUID()}.${ext}`;
+      const contentType = this._resolveContentType(file, ext);
+
       const { error } = await supabaseClient.storage.from(bucket).upload(path, file, {
         cacheControl: '3600',
         upsert: false,
+        contentType,
       });
       if (error) throw error;
 
       const { data } = supabaseClient.storage.from(bucket).getPublicUrl(path);
       return data.publicUrl;
+    },
+
+    // Muchos navegadores (sobre todo en móvil) no asignan un file.type
+    // confiable a archivos .m4a/.wav grabados desde la app de cámara/notas
+    // de voz. Sin un Content-Type correcto, Supabase Storage y el navegador
+    // no reconocen el audio como reproducible (se ve como 0:00 / 0:00).
+    // Por eso resolvemos el tipo MIME real a partir de la extensión.
+    _resolveContentType(file, ext) {
+      const e = (ext || '').toLowerCase();
+      const map = {
+        m4a: 'audio/mp4',
+        mp4: 'audio/mp4',
+        mp3: 'audio/mpeg',
+        wav: 'audio/wav',
+        ogg: 'audio/ogg',
+        oga: 'audio/ogg',
+        webm: 'audio/webm',
+        aac: 'audio/aac',
+        flac: 'audio/flac',
+        jpg: 'image/jpeg',
+        jpeg: 'image/jpeg',
+        png: 'image/png',
+        webp: 'image/webp',
+        gif: 'image/gif',
+      };
+      if (map[e]) return map[e];
+      // Si el navegador sí trajo un tipo válido (no vacío ni genérico), úsalo.
+      if (file.type && file.type !== 'application/octet-stream') return file.type;
+      return undefined;
     },
 
     _shuffle(arr) {
@@ -1096,14 +1129,43 @@ a{ color:inherit; }
       }
       document.querySelectorAll('.audio-option').forEach(b => b.classList.remove('playing'));
 
-      const audio = new Audio(url);
+      const audio = new Audio();
       state.currentAudio = audio;
       if (btnEl) btnEl.classList.add('playing');
 
-      audio.play().catch(() => {});
+      // Diagnóstico: si el audio falla (URL rota, bucket privado, CORS, etc.)
+      // lo mostramos en consola y como aviso visible en pantalla.
+      audio.addEventListener('error', () => {
+        console.error('[Audio] Error al cargar el audio:', url, audio.error);
+        if (btnEl) btnEl.classList.remove('playing');
+        showInlineNotice('No se pudo reproducir este audio. Revisa que el archivo exista y que el bucket sea público.');
+      });
+
       audio.addEventListener('ended', () => {
         if (btnEl) btnEl.classList.remove('playing');
       });
+
+      audio.src = url;
+
+      const playPromise = audio.play();
+      if (playPromise && typeof playPromise.catch === 'function') {
+        playPromise.catch(err => {
+          console.error('[Audio] play() rechazado:', url, err);
+          if (btnEl) btnEl.classList.remove('playing');
+          showInlineNotice('El navegador bloqueó la reproducción. Intenta tocar la alternativa de nuevo.');
+        });
+      }
+    }
+
+    function showInlineNotice(message) {
+      let notice = document.getElementById('audioNotice');
+      if (!notice) {
+        notice = document.createElement('div');
+        notice.id = 'audioNotice';
+        notice.style.cssText = 'font-size:12px;color:#D92D20;text-align:center;margin-top:8px;';
+        els.content.appendChild(notice);
+      }
+      notice.textContent = message;
     }
 
     function resolveAnswer(isCorrect, selectedBtn, exercise) {
