@@ -743,6 +743,80 @@ a{ color:inherit; }
 .toast.success{ background: var(--color-success); }
 
 /* ==========================================================
+   MODAL DE BIENVENIDA (pregunta el nombre al entrar a la app)
+========================================================== */
+.name-gate{
+  position:fixed;
+  inset:0;
+  display:none;
+  align-items:center;
+  justify-content:center;
+  background: rgba(22, 19, 31, 0.55);
+  padding: 24px;
+  z-index: 1000;
+}
+.name-gate.show{ display:flex; }
+.name-gate-card{
+  width:100%;
+  max-width: 360px;
+  background: var(--color-bg);
+  border-radius: var(--radius-lg);
+  padding: 28px 24px 24px;
+  box-shadow: var(--shadow-card);
+  text-align:center;
+  animation: nameGatePop .3s cubic-bezier(.34,1.56,.64,1);
+}
+@keyframes nameGatePop{
+  0%{ transform: scale(0.9); opacity:0; }
+  100%{ transform: scale(1); opacity:1; }
+}
+.name-gate-icon{
+  width:52px; height:52px;
+  margin: 0 auto 14px;
+  border-radius:50%;
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+  display:flex; align-items:center; justify-content:center;
+}
+.name-gate-icon svg{ width:24px; height:24px; }
+.name-gate-card h2{
+  font-family: var(--font-display);
+  font-size:19px;
+  margin: 0 0 6px;
+  color: var(--color-text);
+}
+.name-gate-card p{
+  font-size:13.5px;
+  color: var(--color-text-muted);
+  margin: 0 0 18px;
+  line-height:1.5;
+}
+.name-gate-card input{
+  width:100%;
+  padding:13px 16px;
+  border-radius: var(--radius-pill);
+  border:1.5px solid var(--color-border);
+  background: var(--color-surface);
+  font-family: inherit;
+  font-size:15px;
+  color: var(--color-text);
+  margin-bottom:14px;
+  text-align:center;
+}
+.name-gate-card input:focus{ outline:2px solid var(--color-primary-light); border-color: var(--color-primary); }
+.name-gate-skip{
+  display:block;
+  margin-top:12px;
+  font-size:12.5px;
+  color: var(--color-text-muted);
+  text-decoration:underline;
+  cursor:pointer;
+  background:none;
+  border:none;
+  font-family:inherit;
+}
+
+/* ==========================================================
    ADMIN — reutiliza tokens, layout tipo panel
 ========================================================== */
 .admin-shell{
@@ -1011,35 +1085,6 @@ a{ color:inherit; }
   color: var(--color-text-muted);
   margin:0;
 }
-.profile-name-edit{
-  display:flex;
-  gap:8px;
-}
-.profile-name-edit input{
-  flex:1;
-  min-width:0;
-  padding:11px 14px;
-  border-radius: var(--radius-pill);
-  border:1px solid var(--color-border);
-  font-family: var(--font-body);
-  font-size:14px;
-  background: var(--color-surface);
-  color: var(--color-text);
-}
-.profile-name-edit input:focus{ outline:2px solid var(--color-primary-light); }
-.profile-name-edit button{
-  flex-shrink:0;
-  width:44px; height:44px;
-  border-radius:50%;
-  border:none;
-  background: var(--color-primary);
-  color:#fff;
-  font-size:16px;
-  cursor:pointer;
-  display:flex; align-items:center; justify-content:center;
-}
-.profile-name-edit button svg{ width:18px; height:18px; }
-.profile-name-edit button:active{ transform: scale(0.93); }
 
 .profile-stats-row{
   display:flex;
@@ -1163,6 +1208,22 @@ a{ color:inherit; }
 </style>
 </head>
 <body>
+
+  <!-- ============================================================
+       MODAL DE BIENVENIDA — pregunta el nombre al entrar a la app
+  ============================================================ -->
+  <div class="name-gate" id="nameGate">
+    <div class="name-gate-card">
+      <div class="name-gate-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.5-7 8-7s8 3 8 7"/></svg>
+      </div>
+      <h2>¡Bienvenido/a!</h2>
+      <p>¿Cómo te llamas? Usaremos tu nombre para personalizar tu perfil y tus medallas.</p>
+      <input type="text" id="inputNameGate" placeholder="Escribe tu nombre" maxlength="40" autocomplete="off" />
+      <button class="btn btn-primary" id="btnNameGateContinue">Continuar</button>
+      <button class="name-gate-skip" id="btnNameGateSkip">Omitir por ahora</button>
+    </div>
+  </div>
 
   <!-- ============================================================
        PÁGINA 1: INICIO
@@ -1387,19 +1448,13 @@ a{ color:inherit; }
       return data || [];
     },
 
-    async getRandomExercise(activityType = ACTIVITY_TYPES.QUE_VEO, excludeId = null) {
+    async getExercisesInOrder(activityType = ACTIVITY_TYPES.QUE_VEO) {
+      // Devuelve los ejercicios utilizables en el orden en que fueron
+      // registrados (más antiguo primero), sin repetir ni mezclar.
       const exercises = await this.getExercises(activityType);
-      const usable = exercises.filter(e => e.exercise_audios && e.exercise_audios.length >= 2);
-      if (usable.length === 0) return null;
-
-      let pool = usable;
-      if (excludeId && usable.length > 1) {
-        pool = usable.filter(e => e.id !== excludeId);
-      }
-      const picked = pool[Math.floor(Math.random() * pool.length)];
-
-      picked.exercise_audios = this._shuffle([...picked.exercise_audios]);
-      return picked;
+      return exercises
+        .filter(e => e.exercise_audios && e.exercise_audios.length >= 2)
+        .sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
     },
 
     async createExercise({ activityType, imageUrl, title, audios }) {
@@ -1651,7 +1706,7 @@ a{ color:inherit; }
       els.content.innerHTML = `
         <div class="profile-header">
           <h1>Mi Perfil</h1>
-          <p>Edita tu nombre y revisa las medallas que has ganado.</p>
+          <p>Revisa las medallas que has ganado.</p>
         </div>
 
         <div class="profile-card">
@@ -1661,10 +1716,6 @@ a{ color:inherit; }
               <p class="profile-name-display" id="profileNameDisplay">${displayName}</p>
               <p class="profile-stat-line">${profile.activitiesCompleted} actividad(es) completada(s)</p>
             </div>
-          </div>
-          <div class="profile-name-edit">
-            <input type="text" id="inputProfileName" placeholder="Escribe tu nombre" maxlength="40" value="${profile.name ? profile.name.replace(/"/g, '&quot;') : ''}" />
-            <button id="btnSaveProfileName" title="Guardar nombre">${ICONS.save}</button>
           </div>
         </div>
 
@@ -1684,11 +1735,6 @@ a{ color:inherit; }
           ${BADGES.map(badge => renderBadge(badge, profile.badgeIds.includes(badge.id))).join('')}
         </div>
       `;
-
-      document.getElementById('btnSaveProfileName').addEventListener('click', saveName);
-      document.getElementById('inputProfileName').addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') saveName();
-      });
     }
 
     function renderBadge(badge, unlocked) {
@@ -1701,21 +1747,6 @@ a{ color:inherit; }
       `;
     }
 
-    function saveName() {
-      const input = document.getElementById('inputProfileName');
-      ProfileService.setName(input.value);
-      render();
-      showProfileToast('Nombre guardado.', 'success');
-    }
-
-    function showProfileToast(message, type = '') {
-      const toastEl = document.getElementById('toast');
-      if (!toastEl) return;
-      toastEl.textContent = message;
-      toastEl.className = `toast show ${type}`;
-      setTimeout(() => { toastEl.className = 'toast'; }, 2800);
-    }
-
     return { enter };
   })();
   </script>
@@ -1725,12 +1756,11 @@ a{ color:inherit; }
   // LÓGICA DE LA ACTIVIDAD "¿QUÉ VEO?"
   // ============================================================
   const ActivityScreen = (() => {
-    const DEFAULT_TOTAL_QUESTIONS = 5;
     const POINTS_PER_QUESTION = 10;
 
     const state = {
       currentExercise: null,
-      lastExerciseId: null,
+      exercises: [],          // lista completa de ejercicios, en orden de registro
       answered: false,
       selectedIndex: null,
       correctCount: 0,
@@ -1738,7 +1768,7 @@ a{ color:inherit; }
       currentAudio: null,
       initialized: false,
       questionIndex: 0,      // 0-based, pregunta actual dentro de la sesión
-      totalQuestions: DEFAULT_TOTAL_QUESTIONS, // se ajusta según ejercicios disponibles
+      totalQuestions: 0,      // se ajusta según ejercicios disponibles
       score: 0,               // puntos acumulados en la sesión
       streak: 0,              // aciertos consecutivos
     };
@@ -1762,28 +1792,34 @@ a{ color:inherit; }
       state.streak = 0;
       state.correctCount = 0;
       state.totalCount = 0;
-      state.lastExerciseId = null;
-      state.totalQuestions = DEFAULT_TOTAL_QUESTIONS;
+      state.exercises = [];
+      state.totalQuestions = 0;
       updateScoreDisplay(false);
       updateStreakDisplay();
 
       renderLoading();
 
-      // La cantidad total de preguntas (y por lo tanto el puntaje máximo)
-      // depende de cuántos ejercicios utilizables existan en este momento.
+      // Se cargan todas las preguntas registradas, en el orden en que
+      // fueron creadas. No se repiten ni se muestran al azar: se recorren
+      // una por una hasta completarlas todas.
       try {
-        const exercises = await DataService.getExercises(ACTIVITY_TYPES.QUE_VEO);
-        const usable = exercises.filter(e => e.exercise_audios && e.exercise_audios.length >= 2);
-        state.totalQuestions = usable.length > 0 ? usable.length : DEFAULT_TOTAL_QUESTIONS;
+        state.exercises = await DataService.getExercisesInOrder(ACTIVITY_TYPES.QUE_VEO);
+        state.totalQuestions = state.exercises.length;
       } catch (err) {
         console.error(err);
-        // Si falla, seguimos con el valor por defecto.
+        state.exercises = [];
+        state.totalQuestions = 0;
+      }
+
+      if (state.totalQuestions === 0) {
+        renderEmpty();
+        return;
       }
 
       loadNextExercise();
     }
 
-    async function loadNextExercise() {
+    function loadNextExercise() {
       if (state.questionIndex >= state.totalQuestions) {
         renderComplete();
         return;
@@ -1794,22 +1830,18 @@ a{ color:inherit; }
       els.pointsBadge.style.display = 'none';
       els.questionCounter.textContent = `Pregunta ${state.questionIndex + 1} de ${state.totalQuestions}`;
       updateProgress((state.questionIndex / state.totalQuestions) * 100);
-      renderLoading();
 
-      try {
-        const exercise = await DataService.getRandomExercise(ACTIVITY_TYPES.QUE_VEO, state.lastExerciseId);
-        state.currentExercise = exercise;
-        state.lastExerciseId = exercise ? exercise.id : null;
-
-        if (!exercise) {
-          renderEmpty();
-          return;
-        }
-        renderExercise(exercise);
-      } catch (err) {
-        console.error(err);
+      const exercise = state.exercises[state.questionIndex];
+      if (!exercise) {
         renderError();
+        return;
       }
+      // Las alternativas de audio de cada pregunta sí se mezclan para que
+      // la respuesta correcta no quede siempre en el mismo lugar; esto no
+      // afecta el orden de las preguntas en sí.
+      exercise.exercise_audios = DataService._shuffle([...exercise.exercise_audios]);
+      state.currentExercise = exercise;
+      renderExercise(exercise);
     }
 
     function renderLoading() {
@@ -2389,6 +2421,47 @@ a{ color:inherit; }
     }
 
     return { enter };
+  })();
+  </script>
+
+  <script>
+  // ============================================================
+  // MODAL DE BIENVENIDA — pregunta el nombre al entrar a la app
+  // Se muestra una sola vez, cuando todavía no hay un nombre
+  // guardado en el perfil. Si el usuario ya tiene nombre, no
+  // vuelve a preguntarse.
+  // ============================================================
+  (function initNameGate() {
+    const gate = document.getElementById('nameGate');
+    const input = document.getElementById('inputNameGate');
+    const btnContinue = document.getElementById('btnNameGateContinue');
+    const btnSkip = document.getElementById('btnNameGateSkip');
+
+    const profile = ProfileService.getProfile();
+    if (profile.name && profile.name.trim()) {
+      return; // ya tiene nombre guardado, no se pregunta de nuevo
+    }
+
+    gate.classList.add('show');
+    input.focus();
+
+    function confirmName() {
+      const value = input.value.trim();
+      if (!value) {
+        input.focus();
+        return;
+      }
+      ProfileService.setName(value);
+      gate.classList.remove('show');
+    }
+
+    btnContinue.addEventListener('click', confirmName);
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') confirmName();
+    });
+    btnSkip.addEventListener('click', () => {
+      gate.classList.remove('show');
+    });
   })();
   </script>
 
