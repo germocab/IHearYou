@@ -1133,12 +1133,13 @@ a{ color:inherit; }
       state.currentAudio = audio;
       if (btnEl) btnEl.classList.add('playing');
 
-      // Diagnóstico: si el audio falla (URL rota, bucket privado, CORS, etc.)
-      // lo mostramos en consola y como aviso visible en pantalla.
       audio.addEventListener('error', () => {
-        console.error('[Audio] Error al cargar el audio:', url, audio.error);
+        const mediaErr = audio.error;
+        const codeMap = {1:'ABORTED', 2:'NETWORK', 3:'DECODE (formato corrupto o no soportado)', 4:'SRC_NOT_SUPPORTED (formato no soportado por este navegador)'};
+        const detail = mediaErr ? `${codeMap[mediaErr.code] || mediaErr.code}` : 'desconocido';
+        console.error('[Audio] Error al cargar:', url, '| código:', detail);
         if (btnEl) btnEl.classList.remove('playing');
-        showInlineNotice('No se pudo reproducir este audio. Revisa que el archivo exista y que el bucket sea público.');
+        showInlineNotice(`No se pudo cargar el audio (${detail}). URL: ${url}`);
       });
 
       audio.addEventListener('ended', () => {
@@ -1150,9 +1151,9 @@ a{ color:inherit; }
       const playPromise = audio.play();
       if (playPromise && typeof playPromise.catch === 'function') {
         playPromise.catch(err => {
-          console.error('[Audio] play() rechazado:', url, err);
+          console.error('[Audio] play() rechazado:', url, '| nombre:', err.name, '| mensaje:', err.message);
           if (btnEl) btnEl.classList.remove('playing');
-          showInlineNotice('El navegador bloqueó la reproducción. Intenta tocar la alternativa de nuevo.');
+          showInlineNotice(`Error al reproducir: ${err.name} — ${err.message}`);
         });
       }
     }
