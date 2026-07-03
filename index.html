@@ -904,6 +904,240 @@ a{ color:inherit; }
   background: var(--color-primary);
   transition: width .2s ease;
 }
+
+/* ==========================================================
+   ESTRUCTURA DE SCROLL INTERNO (deja la tab bar siempre fija)
+========================================================== */
+.page-scroll{
+  flex:1;
+  min-height:0;
+  display:flex;
+  flex-direction:column;
+  overflow-y:auto;
+}
+
+/* ==========================================================
+   BARRA DE PESTAÑAS INFERIOR (look de app nativa)
+========================================================== */
+.tab-bar{
+  flex-shrink:0;
+  display:flex;
+  border-top: 1px solid var(--color-border);
+  background: var(--color-bg);
+  padding: 6px 10px calc(8px + var(--safe-bottom));
+}
+.tab-bar-btn{
+  flex:1;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:3px;
+  border:none;
+  background:none;
+  padding:8px 4px 6px;
+  cursor:pointer;
+  color: var(--color-text-muted);
+  font-family: var(--font-display);
+}
+.tab-bar-btn .tab-icon{
+  font-size:20px;
+  line-height:1;
+  transition: transform .15s cubic-bezier(.34,1.56,.64,1);
+}
+.tab-bar-btn .tab-label{
+  font-size:11px;
+  font-weight:600;
+}
+.tab-bar-btn.active{ color: var(--color-primary); }
+.tab-bar-btn.active .tab-icon{ transform: scale(1.15); }
+
+/* ==========================================================
+   PANTALLA "MI PERFIL"
+========================================================== */
+.profile-screen{
+  flex:1;
+  display:flex;
+  flex-direction:column;
+  padding: calc(28px + var(--safe-top)) 24px 24px;
+}
+.profile-header{
+  margin-bottom: 22px;
+}
+.profile-header h1{
+  font-family: var(--font-display);
+  font-size: 24px;
+  margin: 0 0 4px;
+  color: var(--color-text);
+}
+.profile-header p{
+  font-size:13.5px;
+  color: var(--color-text-muted);
+  margin:0;
+}
+
+.profile-card{
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  margin-bottom: 22px;
+}
+.profile-avatar-row{
+  display:flex;
+  align-items:center;
+  gap:14px;
+  margin-bottom: 16px;
+}
+.profile-avatar{
+  width:54px; height:54px;
+  border-radius:50%;
+  background: linear-gradient(135deg, var(--color-primary), #A78BFA);
+  color:#fff;
+  display:flex; align-items:center; justify-content:center;
+  font-family: var(--font-display);
+  font-size:22px;
+  font-weight:700;
+  flex-shrink:0;
+  text-transform:uppercase;
+}
+.profile-name-display{
+  font-family: var(--font-display);
+  font-size:18px;
+  color: var(--color-text);
+  margin:0 0 2px;
+}
+.profile-stat-line{
+  font-size:12.5px;
+  color: var(--color-text-muted);
+  margin:0;
+}
+.profile-name-edit{
+  display:flex;
+  gap:8px;
+}
+.profile-name-edit input{
+  flex:1;
+  min-width:0;
+  padding:11px 14px;
+  border-radius: var(--radius-pill);
+  border:1px solid var(--color-border);
+  font-family: var(--font-body);
+  font-size:14px;
+  background: var(--color-surface);
+  color: var(--color-text);
+}
+.profile-name-edit input:focus{ outline:2px solid var(--color-primary-light); }
+.profile-name-edit button{
+  flex-shrink:0;
+  width:44px; height:44px;
+  border-radius:50%;
+  border:none;
+  background: var(--color-primary);
+  color:#fff;
+  font-size:16px;
+  cursor:pointer;
+}
+.profile-name-edit button:active{ transform: scale(0.93); }
+
+.profile-stats-row{
+  display:flex;
+  gap:12px;
+  margin-bottom: 22px;
+}
+.profile-stat-box{
+  flex:1;
+  background: var(--color-surface);
+  border-radius: var(--radius-md);
+  padding: 14px 10px;
+  text-align:center;
+}
+.profile-stat-box .value{
+  font-family: var(--font-display);
+  font-weight:700;
+  font-size:20px;
+  color: var(--color-primary);
+}
+.profile-stat-box .label{
+  font-size:11px;
+  color: var(--color-text-muted);
+  margin-top:2px;
+}
+
+.badges-section-title{
+  font-family: var(--font-display);
+  font-size:15px;
+  color: var(--color-text);
+  margin: 0 0 12px;
+}
+.badges-grid{
+  display:grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap:12px;
+}
+.badge-item{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:6px;
+  text-align:center;
+  padding: 12px 6px;
+  border-radius: var(--radius-md);
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+}
+.badge-icon{
+  width:52px; height:52px;
+  border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+  font-size:24px;
+  background: linear-gradient(135deg, #FFE9A8, #F5C542);
+  box-shadow: 0 3px 8px rgba(245,197,66,.35);
+}
+.badge-item.locked .badge-icon{
+  background: var(--color-surface);
+  box-shadow:none;
+  filter: grayscale(1);
+  opacity:.55;
+}
+.badge-item.locked .badge-name,
+.badge-item.locked .badge-desc{ opacity:.5; }
+.badge-name{
+  font-family: var(--font-display);
+  font-size:11.5px;
+  color: var(--color-text);
+  line-height:1.25;
+}
+.badge-desc{
+  font-size:10px;
+  color: var(--color-text-muted);
+  line-height:1.3;
+}
+
+/* Aviso de medalla nueva desbloqueada (se muestra al terminar una actividad) */
+.new-badge-banner{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  background: linear-gradient(135deg, #FFF6DC, #FEEEDD);
+  border: 1px solid #F5C542;
+  border-radius: var(--radius-md);
+  padding: 12px 14px;
+  margin: 0 0 18px;
+  text-align:left;
+  animation: trophyPop .5s cubic-bezier(.34,1.56,.64,1);
+}
+.new-badge-banner .badge-icon{ flex-shrink:0; width:44px; height:44px; font-size:20px; }
+.new-badge-banner .new-badge-text{ flex:1; }
+.new-badge-banner .new-badge-text strong{
+  display:block;
+  font-family: var(--font-display);
+  font-size:13.5px;
+  color: var(--color-text);
+}
+.new-badge-banner .new-badge-text span{
+  font-size:11.5px;
+  color: var(--color-text-muted);
+}
 </style>
 </head>
 <body>
@@ -913,26 +1147,63 @@ a{ color:inherit; }
   ============================================================ -->
   <div class="page active" id="page-home">
     <div class="app-shell">
-      <div class="home-screen">
+      <div class="page-scroll">
+        <div class="home-screen">
 
-        <div class="home-hero" style="margin-top:10px;">
-          <h1>Actividades</h1>
-          <p>Escucha, compara y elige. Cada ejercicio te ayuda a reconocer sonidos del habla de forma divertida.</p>
-        </div>
-
-        <div class="activity-card" id="btnQueVeo">
-          <div class="icon">👁️</div>
-          <div class="body">
-            <h3>¿Qué veo?</h3>
-            <p>Escucha dos audios y elige el que corresponde a la imagen.</p>
+          <div class="home-hero" style="margin-top:10px;">
+            <h1>Actividades</h1>
+            <p>Escucha, compara y elige. Cada ejercicio te ayuda a reconocer sonidos del habla de forma divertida.</p>
           </div>
-          <div class="chevron">›</div>
-        </div>
 
-        <div class="home-footer-link">
-          <a id="btnGoAdmin">Panel de administración</a>
+          <div class="activity-card" id="btnQueVeo">
+            <div class="icon">👁️</div>
+            <div class="body">
+              <h3>¿Qué veo?</h3>
+              <p>Escucha dos audios y elige el que corresponde a la imagen.</p>
+            </div>
+            <div class="chevron">›</div>
+          </div>
+
+          <div class="home-footer-link">
+            <a id="btnGoAdmin">Panel de administración</a>
+          </div>
         </div>
       </div>
+
+      <nav class="tab-bar" id="tabBarHome">
+        <button class="tab-bar-btn active" data-tab="home">
+          <span class="tab-icon">🏠</span>
+          <span class="tab-label">Actividades</span>
+        </button>
+        <button class="tab-bar-btn" data-tab="profile">
+          <span class="tab-icon">🙂</span>
+          <span class="tab-label">Mi Perfil</span>
+        </button>
+      </nav>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       PÁGINA "MI PERFIL"
+  ============================================================ -->
+  <div class="page" id="page-profile">
+    <div class="app-shell">
+      <div class="page-scroll">
+        <div class="profile-screen" id="profileScreenContent">
+          <!-- Se renderiza dinámicamente -->
+        </div>
+      </div>
+
+      <nav class="tab-bar" id="tabBarProfile">
+        <button class="tab-bar-btn" data-tab="home">
+          <span class="tab-icon">🏠</span>
+          <span class="tab-label">Actividades</span>
+        </button>
+        <button class="tab-bar-btn active" data-tab="profile">
+          <span class="tab-icon">🙂</span>
+          <span class="tab-label">Mi Perfil</span>
+        </button>
+      </nav>
     </div>
   </div>
 
@@ -1188,6 +1459,7 @@ a{ color:inherit; }
     home: document.getElementById('page-home'),
     activity: document.getElementById('page-activity'),
     admin: document.getElementById('page-admin'),
+    profile: document.getElementById('page-profile'),
   };
 
   function showPage(name) {
@@ -1197,12 +1469,203 @@ a{ color:inherit; }
 
     if (name === 'activity') ActivityScreen.enter();
     if (name === 'admin') AdminScreen.enter();
+    if (name === 'profile') ProfileScreen.enter();
   }
 
   document.getElementById('btnQueVeo').addEventListener('click', () => showPage('activity'));
   document.getElementById('btnGoAdmin').addEventListener('click', () => showPage('admin'));
   document.getElementById('btnCloseActivity').addEventListener('click', () => showPage('home'));
   document.getElementById('btnCloseAdmin').addEventListener('click', () => showPage('home'));
+
+  document.querySelectorAll('.tab-bar-btn').forEach(btn => {
+    btn.addEventListener('click', () => showPage(btn.dataset.tab));
+  });
+  </script>
+
+  <script>
+  // ============================================================
+  // SISTEMA DE PERFIL Y RECOMPENSAS (MEDALLAS)
+  // Se guarda localmente en el dispositivo (localStorage), ya que
+  // la app aún no tiene inicio de sesión de usuario.
+  // ============================================================
+  const PROFILE_STORAGE_KEY = 'oido_app_profile_v1';
+
+  const BADGES = [
+    {
+      id: 'primera_actividad',
+      name: 'Mi primera actividad',
+      desc: 'Completaste tu primera actividad',
+      icon: '🥇',
+    },
+    {
+      id: 'racha_perfecta',
+      name: 'Racha perfecta',
+      desc: 'Respondiste todo bien en una actividad',
+      icon: '🌟',
+    },
+    {
+      id: 'constancia',
+      name: 'Practicante constante',
+      desc: 'Completaste 5 actividades',
+      icon: '🏅',
+    },
+  ];
+
+  const ProfileService = (() => {
+    function getDefaultProfile() {
+      return { name: '', activitiesCompleted: 0, badgeIds: [] };
+    }
+
+    function getProfile() {
+      try {
+        const raw = localStorage.getItem(PROFILE_STORAGE_KEY);
+        if (!raw) return getDefaultProfile();
+        const parsed = JSON.parse(raw);
+        return { ...getDefaultProfile(), ...parsed };
+      } catch (err) {
+        console.error('No se pudo leer el perfil guardado:', err);
+        return getDefaultProfile();
+      }
+    }
+
+    function saveProfile(profile) {
+      try {
+        localStorage.setItem(PROFILE_STORAGE_KEY, JSON.stringify(profile));
+      } catch (err) {
+        console.error('No se pudo guardar el perfil:', err);
+      }
+    }
+
+    function setName(name) {
+      const profile = getProfile();
+      profile.name = (name || '').trim().slice(0, 40);
+      saveProfile(profile);
+      return profile;
+    }
+
+    // Registra que se completó una actividad y evalúa qué medallas
+    // nuevas se desbloquean. Devuelve la lista de medallas nuevas.
+    function recordActivityCompletion({ correctCount, totalQuestions }) {
+      const profile = getProfile();
+      profile.activitiesCompleted = (profile.activitiesCompleted || 0) + 1;
+
+      const newlyUnlocked = [];
+      const unlock = (badgeId) => {
+        if (!profile.badgeIds.includes(badgeId)) {
+          profile.badgeIds.push(badgeId);
+          const def = BADGES.find(b => b.id === badgeId);
+          if (def) newlyUnlocked.push(def);
+        }
+      };
+
+      unlock('primera_actividad');
+      if (totalQuestions > 0 && correctCount === totalQuestions) {
+        unlock('racha_perfecta');
+      }
+      if (profile.activitiesCompleted >= 5) {
+        unlock('constancia');
+      }
+
+      saveProfile(profile);
+      return newlyUnlocked;
+    }
+
+    return { getProfile, setName, recordActivityCompletion };
+  })();
+  </script>
+
+  <script>
+  // ============================================================
+  // LÓGICA DE LA PANTALLA "MI PERFIL"
+  // ============================================================
+  const ProfileScreen = (() => {
+    const els = {
+      content: document.getElementById('profileScreenContent'),
+    };
+
+    function enter() {
+      render();
+    }
+
+    function getInitial(name) {
+      const trimmed = (name || '').trim();
+      return trimmed ? trimmed.charAt(0) : '🙂';
+    }
+
+    function render() {
+      const profile = ProfileService.getProfile();
+      const displayName = profile.name && profile.name.trim() ? profile.name.trim() : 'Sin nombre aún';
+
+      els.content.innerHTML = `
+        <div class="profile-header">
+          <h1>Mi Perfil</h1>
+          <p>Edita tu nombre y revisa las medallas que has ganado.</p>
+        </div>
+
+        <div class="profile-card">
+          <div class="profile-avatar-row">
+            <div class="profile-avatar" id="profileAvatar">${getInitial(profile.name)}</div>
+            <div>
+              <p class="profile-name-display" id="profileNameDisplay">${displayName}</p>
+              <p class="profile-stat-line">${profile.activitiesCompleted} actividad(es) completada(s)</p>
+            </div>
+          </div>
+          <div class="profile-name-edit">
+            <input type="text" id="inputProfileName" placeholder="Escribe tu nombre" maxlength="40" value="${profile.name ? profile.name.replace(/"/g, '&quot;') : ''}" />
+            <button id="btnSaveProfileName" title="Guardar nombre">💾</button>
+          </div>
+        </div>
+
+        <div class="profile-stats-row">
+          <div class="profile-stat-box">
+            <div class="value">${profile.activitiesCompleted}</div>
+            <div class="label">Actividades</div>
+          </div>
+          <div class="profile-stat-box">
+            <div class="value">${profile.badgeIds.length}</div>
+            <div class="label">Medallas</div>
+          </div>
+        </div>
+
+        <h2 class="badges-section-title">Mis medallas</h2>
+        <div class="badges-grid">
+          ${BADGES.map(badge => renderBadge(badge, profile.badgeIds.includes(badge.id))).join('')}
+        </div>
+      `;
+
+      document.getElementById('btnSaveProfileName').addEventListener('click', saveName);
+      document.getElementById('inputProfileName').addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') saveName();
+      });
+    }
+
+    function renderBadge(badge, unlocked) {
+      return `
+        <div class="badge-item ${unlocked ? '' : 'locked'}">
+          <div class="badge-icon">${unlocked ? badge.icon : '🔒'}</div>
+          <div class="badge-name">${badge.name}</div>
+          <div class="badge-desc">${badge.desc}</div>
+        </div>
+      `;
+    }
+
+    function saveName() {
+      const input = document.getElementById('inputProfileName');
+      ProfileService.setName(input.value);
+      render();
+      showProfileToast('Nombre guardado.', 'success');
+    }
+
+    function showProfileToast(message, type = '') {
+      const toastEl = document.getElementById('toast');
+      if (!toastEl) return;
+      toastEl.textContent = message;
+      toastEl.className = `toast show ${type}`;
+      setTimeout(() => { toastEl.className = 'toast'; }, 2800);
+    }
+
+    return { enter };
+  })();
   </script>
 
   <script>
@@ -1597,6 +2060,25 @@ a{ color:inherit; }
       if (ratio >= 1) message = '¡Puntaje perfecto! Eres un experto escuchando.';
       else if (ratio >= 0.6) message = '¡Muy buen trabajo! Estás mejorando mucho.';
 
+      // Registra la actividad completada en el perfil y revisa si se
+      // desbloqueó alguna medalla nueva (por ejemplo, "Mi primera actividad").
+      const newBadges = ProfileService.recordActivityCompletion({
+        correctCount: correct,
+        totalQuestions: total,
+      });
+
+      const badgeBannerHtml = newBadges.length > 0
+        ? newBadges.map(badge => `
+            <div class="new-badge-banner">
+              <div class="badge-icon">${badge.icon}</div>
+              <div class="new-badge-text">
+                <strong>¡Nueva medalla desbloqueada!</strong>
+                <span>${badge.name} — ${badge.desc}</span>
+              </div>
+            </div>
+          `).join('')
+        : '';
+
       els.content.innerHTML = `
         <div class="complete-screen">
           <div class="trophy">🏆</div>
@@ -1614,6 +2096,7 @@ a{ color:inherit; }
               <div class="label">Puntos</div>
             </div>
           </div>
+          ${badgeBannerHtml}
           <div class="complete-actions">
             <button class="btn btn-primary" id="btnPlayAgain">Jugar de nuevo</button>
             <button class="btn btn-secondary" id="btnBackHome">Volver al inicio</button>
@@ -1624,7 +2107,7 @@ a{ color:inherit; }
       updateProgress(100);
       els.questionCounter.textContent = '¡Completado!';
 
-      if (ratio >= 0.6) spawnConfetti();
+      if (ratio >= 0.6 || newBadges.length > 0) spawnConfetti();
 
       document.getElementById('btnPlayAgain').addEventListener('click', () => enter());
       document.getElementById('btnBackHome').addEventListener('click', () => showPage('home'));
