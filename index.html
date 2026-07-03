@@ -1036,7 +1036,9 @@ a{ color:inherit; }
   color:#fff;
   font-size:16px;
   cursor:pointer;
+  display:flex; align-items:center; justify-content:center;
 }
+.profile-name-edit button svg{ width:18px; height:18px; }
 .profile-name-edit button:active{ transform: scale(0.93); }
 
 .profile-stats-row{
@@ -1138,6 +1140,26 @@ a{ color:inherit; }
   font-size:11.5px;
   color: var(--color-text-muted);
 }
+/* ==========================================================
+   TAMAÑOS DE ÍCONOS SVG (reemplazo de emojis)
+========================================================== */
+.icon-btn svg{ width:18px; height:18px; display:block; }
+.icon-btn.small svg{ width:15px; height:15px; }
+.tab-icon svg{ width:20px; height:20px; display:block; }
+.star-icon svg{ width:16px; height:16px; display:block; }
+.streak-icon{ display:flex; align-items:center; }
+.streak-icon svg{ width:14px; height:14px; display:block; }
+.activity-card .icon svg{ width:26px; height:26px; display:block; }
+.badge-icon svg{ width:24px; height:24px; display:block; }
+.new-badge-banner .badge-icon svg{ width:20px; height:20px; }
+.profile-avatar svg{ width:26px; height:26px; display:block; }
+.dot-icon svg{ width:16px; height:16px; display:block; }
+.check-mark svg{ width:14px; height:14px; display:block; }
+.result-emoji svg{ width:52px; height:52px; display:block; }
+.complete-screen .trophy svg{ width:56px; height:56px; display:block; }
+.complete-stars svg{ width:26px; height:26px; display:inline-block; vertical-align:middle; }
+.feedback-banner svg{ width:20px; height:20px; flex-shrink:0; display:block; }
+.empty-screen svg{ width:40px; height:40px; display:block; margin:0 auto; }
 </style>
 </head>
 <body>
@@ -1156,7 +1178,7 @@ a{ color:inherit; }
           </div>
 
           <div class="activity-card" id="btnQueVeo">
-            <div class="icon">👁️</div>
+            <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:26px;height:26px;"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg></div>
             <div class="body">
               <h3>¿Qué veo?</h3>
               <p>Escucha dos audios y elige el que corresponde a la imagen.</p>
@@ -1172,11 +1194,11 @@ a{ color:inherit; }
 
       <nav class="tab-bar" id="tabBarHome">
         <button class="tab-bar-btn active" data-tab="home">
-          <span class="tab-icon">🏠</span>
+          <span class="tab-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5 12 3l9 6.5"/><path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10"/></svg></span>
           <span class="tab-label">Actividades</span>
         </button>
         <button class="tab-bar-btn" data-tab="profile">
-          <span class="tab-icon">🙂</span>
+          <span class="tab-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.5-7 8-7s8 3 8 7"/></svg></span>
           <span class="tab-label">Mi Perfil</span>
         </button>
       </nav>
@@ -1196,11 +1218,11 @@ a{ color:inherit; }
 
       <nav class="tab-bar" id="tabBarProfile">
         <button class="tab-bar-btn" data-tab="home">
-          <span class="tab-icon">🏠</span>
+          <span class="tab-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5 12 3l9 6.5"/><path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10"/></svg></span>
           <span class="tab-label">Actividades</span>
         </button>
         <button class="tab-bar-btn active" data-tab="profile">
-          <span class="tab-icon">🙂</span>
+          <span class="tab-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.5-7 8-7s8 3 8 7"/></svg></span>
           <span class="tab-label">Mi Perfil</span>
         </button>
       </nav>
@@ -1215,7 +1237,7 @@ a{ color:inherit; }
 
       <!-- Barra superior: cerrar + progreso -->
       <div class="topbar">
-        <button class="icon-btn" id="btnCloseActivity" aria-label="Cerrar actividad">✕</button>
+        <button class="icon-btn" id="btnCloseActivity" aria-label="Cerrar actividad"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px;"><path d="M18 6 6 18"/><path d="M6 6l12 12"/></svg></button>
         <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
         <div class="topbar-trailing">
           <button class="icon-btn" id="btnRepeatHint" aria-label="Ayuda" title="Escucha ambos audios antes de responder">?</button>
@@ -1223,8 +1245,8 @@ a{ color:inherit; }
       </div>
       <div class="score-row">
         <div class="question-counter" id="questionCounter">Pregunta 1 de 5</div>
-        <div class="streak-pill" id="streakPill">🔥 <span id="streakValue">0</span></div>
-        <div class="score-pill" id="scorePill"><span class="star-icon">⭐</span><span id="scoreValue">0</span> pts</div>
+        <div class="streak-pill" id="streakPill"><span class="streak-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;"><path d="M12 2s-6 5.7-6 11a6 6 0 0 0 12 0c0-1.6-.5-2.6-1-3.6.1 1.1-.4 2-1.1 2.4C16.7 10 17 7 15 5c.2 1.6-.6 2.6-1.6 3.1C14 5.6 12 2 12 2z"/></svg></span> <span id="streakValue">0</span></div>
+        <div class="score-pill" id="scorePill"><span class="star-icon"><svg viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1" stroke-linejoin="round" style="width:16px;height:16px;"><path d="M12 2.5l2.9 6.1 6.6.7-5 4.6 1.4 6.6-5.9-3.4-5.9 3.4 1.4-6.6-5-4.6 6.6-.7z"/></svg></span><span id="scoreValue">0</span> pts</div>
       </div>
       <div class="points-badge" id="pointsBadge" style="display:none;">+10 puntos</div>
 
@@ -1242,7 +1264,7 @@ a{ color:inherit; }
 
       <div class="admin-header">
         <h1>Panel de administración</h1>
-        <button class="icon-btn small" id="btnCloseAdmin" title="Volver a la app">✕</button>
+        <button class="icon-btn small" id="btnCloseAdmin" title="Volver a la app"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:15px;height:15px;"><path d="M18 6 6 18"/><path d="M6 6l12 12"/></svg></button>
       </div>
 
       <div class="admin-tabs">
@@ -1313,6 +1335,36 @@ a{ color:inherit; }
   const ACTIVITY_TYPES = {
     QUE_VEO: 'que_veo',
   };
+
+  // ============================================================
+  // ÍCONOS (SVG en línea, estilo trazo, heredan color con currentColor)
+  // Reemplazan los emojis para una identidad visual más profesional.
+  // ============================================================
+  const ICONS = {
+    eye: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg>',
+    home: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5 12 3l9 6.5"/><path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10"/></svg>',
+    user: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.5-7 8-7s8 3 8 7"/></svg>',
+    x: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="M6 6l12 12"/></svg>',
+    flame: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2s-6 5.7-6 11a6 6 0 0 0 12 0c0-1.6-.5-2.6-1-3.6.1 1.1-.4 2-1.1 2.4C16.7 10 17 7 15 5c.2 1.6-.6 2.6-1.6 3.1C14 5.6 12 2 12 2z"/></svg>',
+    star: '<svg viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1" stroke-linejoin="round"><path d="M12 2.5l2.9 6.1 6.6.7-5 4.6 1.4 6.6-5.9-3.4-5.9 3.4 1.4-6.6-5-4.6 6.6-.7z"/></svg>',
+    award: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="6"/><path d="m9 13.5-1.5 7L12 18l4.5 2.5-1.5-7"/></svg>',
+    sparkles: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.5 4.5L18 9l-4.5 1.5L12 15l-1.5-4.5L6 9l4.5-1.5L12 3z"/><path d="M5 17l.8 2.2L8 20l-2.2.8L5 23l-.8-2.2L2 20l2.2-.8L5 17z"/><path d="M19 15l.6 1.7L21.5 17l-1.9.6L19 19.5l-.6-1.9L16.5 17l1.9-.7L19 15z"/></svg>',
+    target: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.4" fill="currentColor"/></svg>',
+    lock: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="9" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>',
+    save: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4h11l3 3v13a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1z"/><path d="M8 4v5h8V4"/><path d="M7 21v-7h10v7"/></svg>',
+    folder: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7z"/></svg>',
+    alertTriangle: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>',
+    check: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>',
+    checkCircle: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="m8 12 2.5 2.5L16 9"/></svg>',
+    refresh: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/><path d="M3 21v-5h5"/></svg>',
+    trophy: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 4h8v5a4 4 0 0 1-8 0V4z"/><path d="M8 5H4v2a4 4 0 0 0 4 4"/><path d="M16 5h4v2a4 4 0 0 1-4 4"/><path d="M12 13v3"/><path d="M9 20h6"/><path d="M10 16h4l1 4H9l1-4z"/></svg>',
+    edit: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>',
+    trash: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/></svg>',
+  };
+  // Envuelve un ícono con un tamaño específico (ancho/alto en px)
+  function iconSized(name, size) {
+    return `<span class="icon-wrap" style="display:inline-flex;width:${size}px;height:${size}px;">${ICONS[name]}</span>`;
+  }
   </script>
 
   <script>
@@ -1495,19 +1547,19 @@ a{ color:inherit; }
       id: 'primera_actividad',
       name: 'Mi primera actividad',
       desc: 'Completaste tu primera actividad',
-      icon: '🥇',
+      icon: ICONS.award,
     },
     {
       id: 'racha_perfecta',
       name: 'Racha perfecta',
       desc: 'Respondiste todo bien en una actividad',
-      icon: '🌟',
+      icon: ICONS.sparkles,
     },
     {
       id: 'constancia',
       name: 'Practicante constante',
       desc: 'Completaste 5 actividades',
-      icon: '🏅',
+      icon: ICONS.target,
     },
   ];
 
@@ -1589,7 +1641,7 @@ a{ color:inherit; }
 
     function getInitial(name) {
       const trimmed = (name || '').trim();
-      return trimmed ? trimmed.charAt(0) : '🙂';
+      return trimmed ? trimmed.charAt(0) : ICONS.user;
     }
 
     function render() {
@@ -1612,7 +1664,7 @@ a{ color:inherit; }
           </div>
           <div class="profile-name-edit">
             <input type="text" id="inputProfileName" placeholder="Escribe tu nombre" maxlength="40" value="${profile.name ? profile.name.replace(/"/g, '&quot;') : ''}" />
-            <button id="btnSaveProfileName" title="Guardar nombre">💾</button>
+            <button id="btnSaveProfileName" title="Guardar nombre">${ICONS.save}</button>
           </div>
         </div>
 
@@ -1642,7 +1694,7 @@ a{ color:inherit; }
     function renderBadge(badge, unlocked) {
       return `
         <div class="badge-item ${unlocked ? '' : 'locked'}">
-          <div class="badge-icon">${unlocked ? badge.icon : '🔒'}</div>
+          <div class="badge-icon">${unlocked ? badge.icon : ICONS.lock}</div>
           <div class="badge-name">${badge.name}</div>
           <div class="badge-desc">${badge.desc}</div>
         </div>
@@ -1772,7 +1824,7 @@ a{ color:inherit; }
     function renderEmpty() {
       els.content.innerHTML = `
         <div class="empty-screen">
-          <div style="font-size:40px;">🗂️</div>
+          <div>${ICONS.folder}</div>
           <p><strong>Aún no hay ejercicios cargados.</strong><br>Agrega contenido desde el panel de administración para comenzar.</p>
           <button class="btn btn-secondary" id="goToAdminFromEmpty" style="margin-top:10px;">Ir al panel</button>
         </div>
@@ -1783,7 +1835,7 @@ a{ color:inherit; }
     function renderError() {
       els.content.innerHTML = `
         <div class="empty-screen">
-          <div style="font-size:40px;">⚠️</div>
+          <div>${ICONS.alertTriangle}</div>
           <p><strong>No se pudo cargar el ejercicio.</strong><br>Verifica tu conexión e inténtalo de nuevo.</p>
           <button class="btn btn-primary" id="retryBtn" style="margin-top:10px;">Reintentar</button>
         </div>
@@ -1796,7 +1848,7 @@ a{ color:inherit; }
 
       els.content.innerHTML = `
         <div class="activity-header">
-          <div class="dot-icon">👁️</div>
+          <div class="dot-icon">${ICONS.eye}</div>
           <h1>¿Qué veo?</h1>
         </div>
         <p class="activity-instructions">Toca una alternativa para escucharla y luego confirma tu respuesta.</p>
@@ -1837,7 +1889,7 @@ a{ color:inherit; }
           <span class="opt-label">${letter}.</span>
           <span class="play-icon">▶</span>
           <span class="waveform">${bars}</span>
-          <span class="check-mark">✓</span>
+          <span class="check-mark">${ICONS.check}</span>
         </button>
       `;
     }
@@ -1940,7 +1992,7 @@ a{ color:inherit; }
         state.score += earned;
 
         banner.className = 'feedback-banner correct show';
-        banner.innerHTML = '✅ ¡Correcto!';
+        banner.innerHTML = `${ICONS.checkCircle} ¡Correcto!`;
         caption.className = 'feedback-caption show';
         caption.textContent = exercise.title ? `Esta es ${exercise.title}` : '¡Muy bien!';
 
@@ -1955,7 +2007,7 @@ a{ color:inherit; }
       } else {
         state.streak = 0;
         banner.className = 'feedback-banner incorrect show';
-        banner.innerHTML = '⚠️ Ups, intenta de nuevo';
+        banner.innerHTML = `${ICONS.alertTriangle} Ups, intenta de nuevo`;
         updateStreakDisplay();
       }
 
@@ -2017,7 +2069,7 @@ a{ color:inherit; }
       const isLastQuestion = state.questionIndex + 1 >= state.totalQuestions;
       const nextLabel = isLastQuestion ? 'Ver resultados' : 'Siguiente pregunta';
       const title = isCorrect ? '¡Bien hecho!' : 'Ups, no era eso';
-      const emoji = isCorrect ? '🎉' : '💭';
+      const emoji = isCorrect ? ICONS.sparkles : ICONS.refresh;
       const sub = isCorrect
         ? (exercise.title ? `Era ${exercise.title}. ¡Buen oído!` : '¡Identificaste el sonido correcto!')
         : 'No pasa nada, sigue intentando en la próxima pregunta.';
@@ -2053,7 +2105,7 @@ a{ color:inherit; }
       else if (ratio >= 0.6) starsCount = 2;
 
       const starsHtml = Array.from({ length: 3 })
-        .map((_, i) => `<span class="${i < starsCount ? '' : 'star-off'}">⭐</span>`)
+        .map((_, i) => `<span class="${i < starsCount ? '' : 'star-off'}">${ICONS.star}</span>`)
         .join('');
 
       let message = '¡Sigue practicando, cada intento suma!';
@@ -2081,7 +2133,7 @@ a{ color:inherit; }
 
       els.content.innerHTML = `
         <div class="complete-screen">
-          <div class="trophy">🏆</div>
+          <div class="trophy">${ICONS.trophy}</div>
           <h1>¡Actividad completada!</h1>
           <p class="complete-sub">${message}</p>
           <div class="complete-score">${state.score}<span> / ${maxScore} pts</span></div>
@@ -2181,7 +2233,7 @@ a{ color:inherit; }
           <input type="radio" name="correctAudio" data-role="correct" ${isCorrectDefault ? 'checked' : ''} />
           Correcta
         </label>
-        <button class="icon-btn small danger" type="button" data-role="remove" title="Quitar alternativa">✕</button>
+        <button class="icon-btn small danger" type="button" data-role="remove" title="Quitar alternativa">${ICONS.x}</button>
       `;
       els.audioInputsContainer.appendChild(row);
 
@@ -2291,8 +2343,8 @@ a{ color:inherit; }
             <p>${ex.exercise_audios.length} alternativas · correcta: ${correctAudio ? (correctAudio.label || 'sin etiqueta') : '—'}</p>
           </div>
           <div class="actions">
-            <button class="icon-btn small" id="edit-${ex.id}" title="Editar nombre">✎</button>
-            <button class="icon-btn small danger" id="del-${ex.id}" title="Eliminar">🗑</button>
+            <button class="icon-btn small" id="edit-${ex.id}" title="Editar nombre">${ICONS.edit}</button>
+            <button class="icon-btn small danger" id="del-${ex.id}" title="Eliminar">${ICONS.trash}</button>
           </div>
         </div>
       `;
