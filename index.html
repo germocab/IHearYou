@@ -8,50 +8,1366 @@
 <link rel="manifest" href="manifest.json" />
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/styles.css" />
+<style>
+/* ==========================================================
+   DESIGN TOKENS
+   Paleta inspirada en las referencias: violeta primario,
+   naranja y azul para las alternativas, verde/rojo feedback.
+========================================================== */
+:root{
+  --color-primary: #7C3AED;
+  --color-primary-dark: #5B21B6;
+  --color-primary-light: #EDE4FF;
+
+  --color-orange: #F5841F;
+  --color-orange-light: #FEEEDD;
+  --color-blue: #2E7DF5;
+  --color-blue-light: #E7F0FF;
+
+  --color-success: #1FA34C;
+  --color-success-light: #E7F8ED;
+  --color-error: #D92D20;
+  --color-error-light: #FDECEA;
+
+  --color-bg: #FFFFFF;
+  --color-surface: #F7F6FB;
+  --color-text: #16131F;
+  --color-text-muted: #6B6779;
+  --color-border: #E7E4EF;
+
+  --radius-lg: 22px;
+  --radius-md: 16px;
+  --radius-pill: 999px;
+
+  --shadow-card: 0 10px 30px rgba(90, 60, 170, 0.10);
+  --shadow-soft: 0 4px 14px rgba(20, 10, 50, 0.06);
+
+  --font-display: 'Fredoka', 'Baloo 2', system-ui, sans-serif;
+  --font-body: 'Inter', system-ui, -apple-system, sans-serif;
+
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+*{ box-sizing: border-box; }
+
+html, body{
+  margin:0; padding:0; height:100%;
+  background: var(--color-surface);
+  color: var(--color-text);
+  font-family: var(--font-body);
+  -webkit-tap-highlight-color: transparent;
+  overscroll-behavior-y: contain;
+}
+
+body{
+  display:flex;
+  justify-content:center;
+}
+
+button{ font-family: inherit; }
+a{ color:inherit; }
+
+/* ==========================================================
+   PÁGINAS (SPA) — solo una visible a la vez
+========================================================== */
+.page{ display:none; width:100%; }
+.page.active{ display:flex; justify-content:center; }
+
+/* Contenedor "teléfono": limita el ancho en pantallas grandes
+   mientras mantiene el look de app móvil en el dispositivo real. */
+.app-shell{
+  width:100%;
+  max-width: 460px;
+  min-height: 100vh;
+  background: var(--color-bg);
+  display:flex;
+  flex-direction:column;
+  position:relative;
+  overflow-x:hidden;
+}
+
+/* ==========================================================
+   BARRA DE ESTADO SUPERIOR (top bar de la actividad)
+========================================================== */
+.topbar{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  padding: calc(14px + var(--safe-top)) 16px 10px;
+}
+
+.icon-btn{
+  width:38px; height:38px;
+  border-radius: 50%;
+  border:none;
+  background: var(--color-surface);
+  color: var(--color-text);
+  display:flex; align-items:center; justify-content:center;
+  font-size:18px;
+  cursor:pointer;
+  flex-shrink:0;
+  transition: background .15s ease, transform .1s ease;
+}
+.icon-btn:active{ transform: scale(0.92); }
+
+.progress-track{
+  flex:1;
+  height:10px;
+  background: var(--color-primary-light);
+  border-radius: var(--radius-pill);
+  overflow:hidden;
+}
+.progress-fill{
+  height:100%;
+  width:0%;
+  background: linear-gradient(90deg, var(--color-primary), #A78BFA);
+  border-radius: var(--radius-pill);
+  transition: width .35s ease;
+}
+
+.topbar-trailing{
+  display:flex; gap:6px;
+  flex-shrink:0;
+}
+.topbar-trailing .icon-btn{
+  width:32px; height:32px; font-size:14px;
+}
+
+.points-badge{
+  text-align:center;
+  font-size:12px;
+  font-weight:700;
+  color: var(--color-primary);
+  margin-top: 4px;
+}
+
+/* ==========================================================
+   CONTENIDO
+========================================================== */
+.screen-content{
+  flex:1;
+  display:flex;
+  flex-direction:column;
+  padding: 6px 20px 24px;
+}
+
+.activity-header{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  margin: 6px 0 4px;
+}
+.activity-header .dot-icon{
+  width:26px;height:26px;
+  border-radius:50%;
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+  display:flex; align-items:center; justify-content:center;
+  font-size:14px;
+}
+.activity-header h1{
+  font-family: var(--font-display);
+  font-size: 19px;
+  margin:0;
+  color: var(--color-primary-dark);
+}
+
+.activity-instructions{
+  font-size: 13px;
+  color: var(--color-text-muted);
+  line-height:1.5;
+  margin: 4px 0 18px;
+}
+
+/* ==========================================================
+   TARJETA DE IMAGEN
+========================================================== */
+.image-card{
+  background: var(--color-surface);
+  border-radius: var(--radius-lg);
+  aspect-ratio: 1 / 0.82;
+  display:flex; align-items:center; justify-content:center;
+  overflow:hidden;
+  margin-bottom: 22px;
+  box-shadow: inset 0 0 0 1px var(--color-border);
+}
+.image-card img{
+  width:100%; height:100%; object-fit:cover;
+  display:block;
+}
+.image-card.placeholder{
+  color: var(--color-text-muted);
+  font-size:14px;
+  flex-direction:column;
+  gap:8px;
+}
+.image-card.placeholder .emoji{ font-size:40px; }
+
+/* ==========================================================
+   FEEDBACK (correcto / incorrecto) sobre la imagen
+========================================================== */
+.feedback-banner{
+  display:none;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  font-family: var(--font-display);
+  font-weight:600;
+  font-size:15px;
+  padding: 10px 14px;
+  border-radius: var(--radius-md);
+  margin-bottom: 12px;
+}
+.feedback-banner.show{ display:flex; }
+.feedback-banner.correct{
+  color: var(--color-success);
+  background: var(--color-success-light);
+}
+.feedback-banner.incorrect{
+  color: var(--color-error);
+  background: var(--color-error-light);
+}
+
+.feedback-caption{
+  text-align:center;
+  font-family: var(--font-display);
+  font-weight:600;
+  font-size:15px;
+  color: var(--color-text);
+  margin: -6px 0 18px;
+  display:none;
+}
+.feedback-caption.show{ display:block; }
+
+/* ==========================================================
+   BOTONES DE AUDIO (alternativas)
+========================================================== */
+.options-list{
+  display:flex;
+  flex-direction:column;
+  gap:14px;
+  margin-top:auto;
+}
+
+.audio-option{
+  --opt-color: var(--color-orange);
+  --opt-bg: var(--color-orange-light);
+  display:flex;
+  align-items:center;
+  gap:12px;
+  width:100%;
+  border-radius: var(--radius-pill);
+  border: 2px solid var(--opt-color);
+  background: var(--opt-bg);
+  color: var(--opt-color);
+  padding: 12px 18px;
+  cursor:pointer;
+  transition: transform .12s ease, box-shadow .12s ease, background .2s ease, color .2s ease, border-color .2s ease;
+  text-align:left;
+}
+.audio-option:active{ transform: scale(0.98); }
+.audio-option.variant-b{
+  --opt-color: var(--color-blue);
+  --opt-bg: var(--color-blue-light);
+}
+
+.audio-option .opt-label{
+  font-weight:700;
+  font-size:14px;
+  flex-shrink:0;
+}
+.audio-option .play-icon{
+  width:30px; height:30px;
+  border-radius:50%;
+  background: var(--opt-color);
+  color: #fff;
+  display:flex; align-items:center; justify-content:center;
+  font-size:12px;
+  flex-shrink:0;
+}
+.audio-option .waveform{
+  flex:1;
+  height:22px;
+  display:flex;
+  align-items:center;
+  gap:2px;
+  overflow:hidden;
+}
+.audio-option .waveform span{
+  display:block;
+  width:3px;
+  min-width:3px;
+  border-radius:2px;
+  background: var(--opt-color);
+  opacity:.55;
+}
+.audio-option.playing .waveform span{
+  animation: waveBounce .9s ease-in-out infinite;
+}
+@keyframes waveBounce{
+  0%, 100%{ transform: scaleY(0.5); opacity:.55;}
+  50%{ transform: scaleY(1); opacity:1;}
+}
+
+/* Estado seleccionado como correcto */
+.audio-option.state-correct{
+  background: var(--color-success);
+  border-color: var(--color-success);
+  color:#fff;
+}
+.audio-option.state-correct .play-icon{ background: rgba(255,255,255,.25); }
+.audio-option.state-correct .waveform span{ background:#fff; }
+
+/* Estado seleccionado como incorrecto */
+.audio-option.state-incorrect{
+  background: var(--color-error);
+  border-color: var(--color-error);
+  color:#fff;
+}
+.audio-option.state-incorrect .play-icon{ background: rgba(255,255,255,.25); }
+.audio-option.state-incorrect .waveform span{ background:#fff; }
+
+.audio-option:disabled{ cursor:default; }
+
+/* Estado: alternativa tocada/elegida, pendiente de confirmar */
+.audio-option.selected{
+  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.35);
+  transform: scale(0.99);
+}
+
+.confirm-select-btn{
+  margin-top: 4px;
+  background: var(--color-success);
+  color: #fff;
+}
+.confirm-select-btn:disabled{
+  background: var(--color-border);
+  color: var(--color-text-muted);
+  opacity: 1;
+}
+
+.check-mark{
+  width:22px; height:22px;
+  border-radius:50%;
+  background: rgba(255,255,255,.3);
+  display:flex; align-items:center; justify-content:center;
+  font-size:12px;
+  flex-shrink:0;
+  display:none;
+}
+.audio-option.state-correct .check-mark,
+.audio-option.state-incorrect .check-mark{ display:flex; }
+
+/* ==========================================================
+   PANTALLA DE INICIO
+========================================================== */
+.home-screen{
+  flex:1;
+  display:flex;
+  flex-direction:column;
+  padding: calc(28px + var(--safe-top)) 24px calc(28px + var(--safe-bottom));
+}
+
+.home-hero{
+  margin-bottom: 30px;
+}
+.home-hero h1{
+  font-family: var(--font-display);
+  font-size: 28px;
+  line-height:1.25;
+  margin:0 0 10px;
+  color: var(--color-text);
+}
+.home-hero p{
+  font-size:14.5px;
+  color: var(--color-text-muted);
+  line-height:1.6;
+  margin:0;
+}
+
+.activity-card{
+  display:flex;
+  align-items:center;
+  gap:14px;
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding:18px;
+  box-shadow: var(--shadow-soft);
+  cursor:pointer;
+  transition: transform .12s ease, box-shadow .12s ease;
+}
+.activity-card:active{ transform: scale(0.98); }
+.activity-card .icon{
+  width:52px; height:52px;
+  border-radius: var(--radius-md);
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+  display:flex; align-items:center; justify-content:center;
+  font-size:24px;
+  flex-shrink:0;
+}
+.activity-card .body{ flex:1; }
+.activity-card h3{
+  margin:0 0 3px;
+  font-size:15.5px;
+  font-family: var(--font-display);
+  color: var(--color-text);
+}
+.activity-card p{
+  margin:0;
+  font-size:12.5px;
+  color: var(--color-text-muted);
+}
+.activity-card .chevron{
+  color: var(--color-text-muted);
+  font-size:18px;
+}
+
+.home-footer-link{
+  margin-top:auto;
+  text-align:center;
+  padding-top: 24px;
+}
+.home-footer-link a{
+  font-size:12.5px;
+  color: var(--color-text-muted);
+  text-decoration:underline;
+  cursor:pointer;
+}
+
+/* ==========================================================
+   BOTONES GENÉRICOS
+========================================================== */
+.btn{
+  display:flex; align-items:center; justify-content:center;
+  gap:8px;
+  width:100%;
+  padding:15px 20px;
+  border-radius: var(--radius-pill);
+  border:none;
+  font-family: var(--font-display);
+  font-weight:600;
+  font-size:15px;
+  cursor:pointer;
+  transition: transform .12s ease, opacity .12s ease;
+}
+.btn:active{ transform: scale(0.97); }
+.btn-primary{ background: var(--color-primary); color:#fff; }
+.btn-secondary{ background: var(--color-primary-light); color: var(--color-primary-dark); }
+.btn:disabled{ opacity:.5; cursor:default; }
+
+/* ==========================================================
+   ESTADOS VACÍOS / CARGA
+========================================================== */
+.loading-screen, .empty-screen{
+  flex:1;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:14px;
+  padding: 40px;
+  text-align:center;
+  color: var(--color-text-muted);
+}
+.spinner{
+  width:34px; height:34px;
+  border-radius:50%;
+  border: 3px solid var(--color-primary-light);
+  border-top-color: var(--color-primary);
+  animation: spin .8s linear infinite;
+}
+@keyframes spin{ to{ transform: rotate(360deg);} }
+
+/* ==========================================================
+   TOASTS
+========================================================== */
+.toast{
+  position:fixed;
+  left:50%; bottom: calc(24px + var(--safe-bottom));
+  transform: translateX(-50%) translateY(20px);
+  background: var(--color-text);
+  color:#fff;
+  padding: 12px 20px;
+  border-radius: var(--radius-pill);
+  font-size:13px;
+  opacity:0;
+  pointer-events:none;
+  transition: all .25s ease;
+  z-index: 999;
+  max-width: 90%;
+  text-align:center;
+}
+.toast.show{
+  opacity:1;
+  transform: translateX(-50%) translateY(0);
+}
+.toast.error{ background: var(--color-error); }
+.toast.success{ background: var(--color-success); }
+
+/* ==========================================================
+   ADMIN — reutiliza tokens, layout tipo panel
+========================================================== */
+.admin-shell{
+  width:100%;
+  max-width: 720px;
+  min-height:100vh;
+  background: var(--color-bg);
+  padding: calc(20px + var(--safe-top)) 20px calc(40px + var(--safe-bottom));
+}
+.admin-header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  margin-bottom:20px;
+}
+.admin-header h1{
+  font-family: var(--font-display);
+  font-size:20px;
+  margin:0;
+  color: var(--color-primary-dark);
+}
+.admin-tabs{
+  display:flex;
+  gap:8px;
+  margin-bottom:20px;
+  border-bottom: 1px solid var(--color-border);
+}
+.admin-tab{
+  padding:10px 4px;
+  margin-right:16px;
+  border:none;
+  background:none;
+  font-family: var(--font-display);
+  font-size:14px;
+  color: var(--color-text-muted);
+  cursor:pointer;
+  border-bottom: 2px solid transparent;
+}
+.admin-tab.active{
+  color: var(--color-primary);
+  border-color: var(--color-primary);
+}
+
+.form-card{
+  background: var(--color-surface);
+  border-radius: var(--radius-lg);
+  padding:20px;
+  margin-bottom:20px;
+}
+.form-group{ margin-bottom:16px; }
+.form-group label{
+  display:block;
+  font-size:13px;
+  font-weight:600;
+  margin-bottom:6px;
+  color: var(--color-text);
+}
+.form-group input[type=text],
+.form-group input[type=file]{
+  width:100%;
+  padding:11px 14px;
+  border-radius: var(--radius-md);
+  border:1px solid var(--color-border);
+  background:#fff;
+  font-size:14px;
+  font-family: inherit;
+}
+.hint{
+  font-size:11.5px;
+  color: var(--color-text-muted);
+  margin-top:4px;
+}
+
+.audio-input-row{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  background:#fff;
+  border:1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding:12px;
+  margin-bottom:10px;
+}
+.audio-input-row .file-field{ flex:1; }
+.audio-input-row input[type=text]{
+  width:100%;
+  border:none;
+  border-bottom:1px dashed var(--color-border);
+  padding:4px 0;
+  font-size:13px;
+  margin-bottom:6px;
+}
+.audio-input-row input[type=file]{
+  font-size:12px;
+}
+.correct-toggle{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:4px;
+  font-size:10.5px;
+  color: var(--color-text-muted);
+  flex-shrink:0;
+  cursor:pointer;
+}
+.correct-toggle input{ width:20px; height:20px; accent-color: var(--color-success); }
+.correct-toggle.is-correct{ color: var(--color-success); font-weight:700; }
+
+.exercise-row{
+  display:flex;
+  align-items:center;
+  gap:14px;
+  background:#fff;
+  border:1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding:12px;
+  margin-bottom:10px;
+}
+.exercise-row img{
+  width:56px;height:56px;
+  border-radius:10px;
+  object-fit:cover;
+  flex-shrink:0;
+  background: var(--color-surface);
+}
+.exercise-row .info{ flex:1; min-width:0; }
+.exercise-row .info h4{
+  margin:0 0 3px;
+  font-size:14px;
+}
+.exercise-row .info p{
+  margin:0;
+  font-size:12px;
+  color: var(--color-text-muted);
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.exercise-row .actions{
+  display:flex;
+  gap:6px;
+  flex-shrink:0;
+}
+.icon-btn.small{ width:32px;height:32px;font-size:14px; }
+.icon-btn.danger{ color: var(--color-error); background: var(--color-error-light); }
+
+.progress-bar-upload{
+  height:6px;
+  background: var(--color-primary-light);
+  border-radius: var(--radius-pill);
+  overflow:hidden;
+  margin-top:8px;
+  display:none;
+}
+.progress-bar-upload.show{ display:block; }
+.progress-bar-upload .fill{
+  height:100%;
+  width:0%;
+  background: var(--color-primary);
+  transition: width .2s ease;
+}
+</style>
 </head>
 <body>
-  <div class="app-shell">
-    <div class="home-screen">
 
-      <div class="home-logo">
-        <div class="mark">👂</div>
-        <div class="wordmark">Oye</div>
-      </div>
+  <!-- ============================================================
+       PÁGINA 1: INICIO
+  ============================================================ -->
+  <div class="page active" id="page-home">
+    <div class="app-shell">
+      <div class="home-screen">
 
-      <div class="home-hero">
-        <h1>Entrena tu oído,<br>a tu ritmo.</h1>
-        <p>Escucha, compara y elige. Cada ejercicio te ayuda a reconocer sonidos del habla de forma divertida.</p>
-      </div>
-
-      <div class="activity-card" id="btnQueVeo">
-        <div class="icon">👁️</div>
-        <div class="body">
-          <h3>¿Qué veo?</h3>
-          <p>Escucha dos audios y elige el que corresponde a la imagen.</p>
+        <div class="home-hero" style="margin-top:10px;">
+          <h1>Entrena tu oído,<br>a tu ritmo.</h1>
+          <p>Escucha, compara y elige. Cada ejercicio te ayuda a reconocer sonidos del habla de forma divertida.</p>
         </div>
-        <div class="chevron">›</div>
-      </div>
 
-      <div class="activity-card locked">
-        <div class="icon">🎧</div>
-        <div class="body">
-          <h3>Próximamente</h3>
-          <p>Nuevas actividades de entrenamiento auditivo.</p>
+        <div class="activity-card" id="btnQueVeo">
+          <div class="icon">👁️</div>
+          <div class="body">
+            <h3>¿Qué veo?</h3>
+            <p>Escucha dos audios y elige el que corresponde a la imagen.</p>
+          </div>
+          <div class="chevron">›</div>
         </div>
-        <div class="chevron">🔒</div>
-      </div>
 
-      <div class="home-footer-link">
-        <a href="admin.html">Panel de administración</a>
+        <div class="home-footer-link">
+          <a id="btnGoAdmin">Panel de administración</a>
+        </div>
       </div>
     </div>
   </div>
 
+  <!-- ============================================================
+       PÁGINA 2: ACTIVIDAD "¿QUÉ VEO?"
+  ============================================================ -->
+  <div class="page" id="page-activity">
+    <div class="app-shell">
+
+      <!-- Barra superior: cerrar + progreso -->
+      <div class="topbar">
+        <button class="icon-btn" id="btnCloseActivity" aria-label="Cerrar actividad">✕</button>
+        <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+        <div class="topbar-trailing">
+          <button class="icon-btn" id="btnRepeatHint" aria-label="Ayuda" title="Escucha ambos audios antes de responder">?</button>
+        </div>
+      </div>
+      <div class="points-badge" id="pointsBadge" style="display:none;">+5 puntos</div>
+
+      <div class="screen-content" id="screenContent">
+        <!-- Se renderiza dinámicamente: loading / ejercicio / vacío -->
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       PÁGINA 3: PANEL DE ADMINISTRACIÓN
+  ============================================================ -->
+  <div class="page" id="page-admin">
+    <div class="admin-shell">
+
+      <div class="admin-header">
+        <h1>Panel de administración</h1>
+        <button class="icon-btn small" id="btnCloseAdmin" title="Volver a la app">✕</button>
+      </div>
+
+      <div class="admin-tabs">
+        <button class="admin-tab active" data-tab="create">Nuevo ejercicio</button>
+        <button class="admin-tab" data-tab="list">Ejercicios (<span id="countBadge">0</span>)</button>
+      </div>
+
+      <!-- ============ TAB: CREAR EJERCICIO ============ -->
+      <section id="tab-create">
+        <div class="form-card">
+          <div class="form-group">
+            <label>Nombre del ejercicio (opcional, se usa como retroalimentación)</label>
+            <input type="text" id="inputTitle" placeholder="Ej: una fuente con manzanas" />
+            <div class="hint">Se mostrará como "Esta es [nombre]" al responder correctamente.</div>
+          </div>
+
+          <div class="form-group">
+            <label>Imagen del ejercicio</label>
+            <input type="file" id="inputImage" accept="image/*" />
+            <div class="hint">Formatos permitidos: JPG, PNG, WEBP.</div>
+          </div>
+
+          <div class="form-group">
+            <label>Alternativas de audio</label>
+            <div id="audioInputsContainer"></div>
+            <button class="btn btn-secondary" id="btnAddAudio" type="button" style="margin-top:6px;">+ Agregar alternativa</button>
+          </div>
+
+          <div class="progress-bar-upload" id="uploadProgress"><div class="fill" id="uploadProgressFill"></div></div>
+
+          <button class="btn btn-primary" id="btnSaveExercise" style="margin-top:10px;">Guardar ejercicio</button>
+        </div>
+      </section>
+
+      <!-- ============ TAB: LISTA DE EJERCICIOS ============ -->
+      <section id="tab-list" style="display:none;">
+        <div id="exerciseList"></div>
+      </section>
+
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <!-- SDK de Supabase -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
   <script>
-    document.getElementById('btnQueVeo').addEventListener('click', () => {
-      window.location.href = 'activity.html';
-    });
+  // ============================================================
+  // CONFIGURACIÓN DE SUPABASE
+  // ============================================================
+  const SUPABASE_URL = 'https://vytwbeyljlaqcmlupmgx.supabase.co';
+  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZ5dHdiZXlsamxhcWNtbHVwbWd4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODMwOTUyMjQsImV4cCI6MjA5ODY3MTIyNH0.XzklQ942d-ZX6p9_yhO5PK_kgpuqlg6gxY4FgWmwXag';
+
+  const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  const TABLES = {
+    EXERCISES: 'exercises',
+    AUDIOS: 'exercise_audios',
+  };
+
+  const BUCKETS = {
+    IMAGES: 'images',
+    AUDIOS: 'audios',
+  };
+
+  const ACTIVITY_TYPES = {
+    QUE_VEO: 'que_veo',
+  };
   </script>
+
+  <script>
+  // ============================================================
+  // CAPA DE DATOS — compartida entre la actividad y el admin
+  // ============================================================
+  const DataService = {
+
+    async getExercises(activityType = ACTIVITY_TYPES.QUE_VEO) {
+      const { data, error } = await supabaseClient
+        .from(TABLES.EXERCISES)
+        .select(`
+          id, activity_type, image_url, title, created_at,
+          exercise_audios ( id, audio_url, label, is_correct, position )
+        `)
+        .eq('activity_type', activityType)
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      return data || [];
+    },
+
+    async getRandomExercise(activityType = ACTIVITY_TYPES.QUE_VEO, excludeId = null) {
+      const exercises = await this.getExercises(activityType);
+      const usable = exercises.filter(e => e.exercise_audios && e.exercise_audios.length >= 2);
+      if (usable.length === 0) return null;
+
+      let pool = usable;
+      if (excludeId && usable.length > 1) {
+        pool = usable.filter(e => e.id !== excludeId);
+      }
+      const picked = pool[Math.floor(Math.random() * pool.length)];
+
+      picked.exercise_audios = this._shuffle([...picked.exercise_audios]);
+      return picked;
+    },
+
+    async createExercise({ activityType, imageUrl, title, audios }) {
+      const { data: exercise, error: exErr } = await supabaseClient
+        .from(TABLES.EXERCISES)
+        .insert({ activity_type: activityType, image_url: imageUrl, title })
+        .select()
+        .single();
+      if (exErr) throw exErr;
+
+      const rows = audios.map((a, i) => ({
+        exercise_id: exercise.id,
+        audio_url: a.url,
+        label: a.label || null,
+        is_correct: !!a.isCorrect,
+        position: i,
+      }));
+
+      const { error: audErr } = await supabaseClient.from(TABLES.AUDIOS).insert(rows);
+      if (audErr) throw audErr;
+
+      return exercise;
+    },
+
+    async deleteExercise(exerciseId) {
+      const { error } = await supabaseClient.from(TABLES.EXERCISES).delete().eq('id', exerciseId);
+      if (error) throw error;
+    },
+
+    async updateExerciseTitle(exerciseId, title) {
+      const { error } = await supabaseClient.from(TABLES.EXERCISES).update({ title }).eq('id', exerciseId);
+      if (error) throw error;
+    },
+
+    async setCorrectAudio(exerciseId, correctAudioId) {
+      const { error: e1 } = await supabaseClient
+        .from(TABLES.AUDIOS)
+        .update({ is_correct: false })
+        .eq('exercise_id', exerciseId);
+      if (e1) throw e1;
+
+      const { error: e2 } = await supabaseClient
+        .from(TABLES.AUDIOS)
+        .update({ is_correct: true })
+        .eq('id', correctAudioId);
+      if (e2) throw e2;
+    },
+
+    async uploadFile(bucket, file) {
+      const ext = file.name.split('.').pop();
+      const path = `${crypto.randomUUID()}.${ext}`;
+      const { error } = await supabaseClient.storage.from(bucket).upload(path, file, {
+        cacheControl: '3600',
+        upsert: false,
+      });
+      if (error) throw error;
+
+      const { data } = supabaseClient.storage.from(bucket).getPublicUrl(path);
+      return data.publicUrl;
+    },
+
+    _shuffle(arr) {
+      for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+      return arr;
+    },
+  };
+  </script>
+
+  <script>
+  // ============================================================
+  // NAVEGACIÓN ENTRE PÁGINAS (SPA)
+  // ============================================================
+  const pages = {
+    home: document.getElementById('page-home'),
+    activity: document.getElementById('page-activity'),
+    admin: document.getElementById('page-admin'),
+  };
+
+  function showPage(name) {
+    Object.values(pages).forEach(p => p.classList.remove('active'));
+    pages[name].classList.add('active');
+    window.scrollTo(0, 0);
+
+    if (name === 'activity') ActivityScreen.enter();
+    if (name === 'admin') AdminScreen.enter();
+  }
+
+  document.getElementById('btnQueVeo').addEventListener('click', () => showPage('activity'));
+  document.getElementById('btnGoAdmin').addEventListener('click', () => showPage('admin'));
+  document.getElementById('btnCloseActivity').addEventListener('click', () => showPage('home'));
+  document.getElementById('btnCloseAdmin').addEventListener('click', () => showPage('home'));
+  </script>
+
+  <script>
+  // ============================================================
+  // LÓGICA DE LA ACTIVIDAD "¿QUÉ VEO?"
+  // ============================================================
+  const ActivityScreen = (() => {
+    const state = {
+      currentExercise: null,
+      lastExerciseId: null,
+      answered: false,
+      selectedIndex: null,
+      correctCount: 0,
+      totalCount: 0,
+      currentAudio: null,
+      initialized: false,
+    };
+
+    const els = {
+      content: document.getElementById('screenContent'),
+      progressFill: document.getElementById('progressFill'),
+      pointsBadge: document.getElementById('pointsBadge'),
+    };
+
+    // Se llama cada vez que se entra a la pantalla de actividad.
+    function enter() {
+      loadNextExercise();
+    }
+
+    async function loadNextExercise() {
+      state.answered = false;
+      state.selectedIndex = null;
+      els.pointsBadge.style.display = 'none';
+      updateProgress(0);
+      renderLoading();
+
+      try {
+        const exercise = await DataService.getRandomExercise(ACTIVITY_TYPES.QUE_VEO, state.lastExerciseId);
+        state.currentExercise = exercise;
+        state.lastExerciseId = exercise ? exercise.id : null;
+
+        if (!exercise) {
+          renderEmpty();
+          return;
+        }
+        renderExercise(exercise);
+      } catch (err) {
+        console.error(err);
+        renderError();
+      }
+    }
+
+    function renderLoading() {
+      els.content.innerHTML = `
+        <div class="loading-screen">
+          <div class="spinner"></div>
+          <p>Cargando ejercicio…</p>
+        </div>
+      `;
+    }
+
+    function renderEmpty() {
+      els.content.innerHTML = `
+        <div class="empty-screen">
+          <div style="font-size:40px;">🗂️</div>
+          <p><strong>Aún no hay ejercicios cargados.</strong><br>Agrega contenido desde el panel de administración para comenzar.</p>
+          <button class="btn btn-secondary" id="goToAdminFromEmpty" style="margin-top:10px;">Ir al panel</button>
+        </div>
+      `;
+      document.getElementById('goToAdminFromEmpty').addEventListener('click', () => showPage('admin'));
+    }
+
+    function renderError() {
+      els.content.innerHTML = `
+        <div class="empty-screen">
+          <div style="font-size:40px;">⚠️</div>
+          <p><strong>No se pudo cargar el ejercicio.</strong><br>Verifica tu conexión e inténtalo de nuevo.</p>
+          <button class="btn btn-primary" id="retryBtn" style="margin-top:10px;">Reintentar</button>
+        </div>
+      `;
+      document.getElementById('retryBtn').addEventListener('click', loadNextExercise);
+    }
+
+    function renderExercise(exercise) {
+      const audios = exercise.exercise_audios;
+
+      els.content.innerHTML = `
+        <div class="activity-header">
+          <div class="dot-icon">👁️</div>
+          <h1>¿Qué veo?</h1>
+        </div>
+        <p class="activity-instructions">Toca una alternativa para escucharla y luego confirma tu respuesta.</p>
+
+        <div class="image-card">
+          <img src="${exercise.image_url}" alt="Imagen del ejercicio" />
+        </div>
+
+        <div class="feedback-banner" id="feedbackBanner"></div>
+        <div class="feedback-caption" id="feedbackCaption"></div>
+
+        <div class="options-list" id="optionsList">
+          ${audios.map((a, i) => renderOptionButton(a, i)).join('')}
+          <button class="btn confirm-select-btn" id="btnConfirmSelect" disabled>Seleccionar</button>
+        </div>
+      `;
+
+      audios.forEach((a, i) => {
+        const btn = document.getElementById(`opt-${i}`);
+        btn.addEventListener('click', () => handleTapOption(i, exercise));
+      });
+
+      document.getElementById('btnConfirmSelect').addEventListener('click', () => {
+        if (state.selectedIndex === null) return;
+        confirmSelection(exercise);
+      });
+    }
+
+    function renderOptionButton(audio, index) {
+      const letter = String.fromCharCode(65 + index);
+      const variantClass = index % 2 === 1 ? 'variant-b' : '';
+      const bars = Array.from({ length: 22 })
+        .map(() => `<span style="height:${6 + Math.round(Math.random() * 14)}px;"></span>`)
+        .join('');
+
+      return `
+        <button class="audio-option ${variantClass}" id="opt-${index}" data-audio-url="${audio.audio_url}">
+          <span class="opt-label">${letter}.</span>
+          <span class="play-icon">▶</span>
+          <span class="waveform">${bars}</span>
+          <span class="check-mark">✓</span>
+        </button>
+      `;
+    }
+
+    function handleTapOption(index, exercise) {
+      if (state.answered) return;
+
+      const btn = document.getElementById(`opt-${index}`);
+      playAudio(exercise.exercise_audios[index].audio_url, btn);
+
+      state.selectedIndex = index;
+      document.querySelectorAll('.audio-option').forEach(b => b.classList.remove('selected'));
+      btn.classList.add('selected');
+
+      document.getElementById('btnConfirmSelect').disabled = false;
+    }
+
+    function confirmSelection(exercise) {
+      if (state.answered || state.selectedIndex === null) return;
+      state.answered = true;
+
+      const index = state.selectedIndex;
+      const audioData = exercise.exercise_audios[index];
+      const btn = document.getElementById(`opt-${index}`);
+      const isCorrect = !!audioData.is_correct;
+
+      document.getElementById('btnConfirmSelect').style.display = 'none';
+      resolveAnswer(isCorrect, btn, exercise);
+    }
+
+    function playAudio(url, btnEl) {
+      if (state.currentAudio) {
+        state.currentAudio.pause();
+      }
+      document.querySelectorAll('.audio-option').forEach(b => b.classList.remove('playing'));
+
+      const audio = new Audio(url);
+      state.currentAudio = audio;
+      if (btnEl) btnEl.classList.add('playing');
+
+      audio.play().catch(() => {});
+      audio.addEventListener('ended', () => {
+        if (btnEl) btnEl.classList.remove('playing');
+      });
+    }
+
+    function resolveAnswer(isCorrect, selectedBtn, exercise) {
+      state.totalCount++;
+      if (isCorrect) state.correctCount++;
+
+      updateProgress(100);
+
+      document.querySelectorAll('.audio-option').forEach(btn => {
+        if (btn !== selectedBtn) {
+          btn.style.display = 'none';
+        } else {
+          btn.disabled = true;
+          btn.classList.add(isCorrect ? 'state-correct' : 'state-incorrect');
+        }
+      });
+
+      const banner = document.getElementById('feedbackBanner');
+      const caption = document.getElementById('feedbackCaption');
+
+      if (isCorrect) {
+        banner.className = 'feedback-banner correct show';
+        banner.innerHTML = '✅ Correcto';
+        caption.className = 'feedback-caption show';
+        caption.textContent = exercise.title ? `Esta es ${exercise.title}` : '¡Muy bien!';
+        els.pointsBadge.style.display = 'block';
+      } else {
+        banner.className = 'feedback-banner incorrect show';
+        banner.innerHTML = '⚠️ Ups, intenta de nuevo';
+      }
+
+      setTimeout(loadNextExercise, 1700);
+    }
+
+    function updateProgress(pct) {
+      els.progressFill.style.width = `${pct}%`;
+    }
+
+    return { enter };
+  })();
+  </script>
+
+  <script>
+  // ============================================================
+  // LÓGICA DEL PANEL DE ADMINISTRACIÓN
+  // ============================================================
+  const AdminScreen = (() => {
+    let audioRowCount = 0;
+    let initialized = false;
+
+    const els = {
+      tabs: document.querySelectorAll('.admin-tab'),
+      tabCreate: document.getElementById('tab-create'),
+      tabList: document.getElementById('tab-list'),
+      countBadge: document.getElementById('countBadge'),
+
+      inputTitle: document.getElementById('inputTitle'),
+      inputImage: document.getElementById('inputImage'),
+      audioInputsContainer: document.getElementById('audioInputsContainer'),
+      btnAddAudio: document.getElementById('btnAddAudio'),
+      btnSaveExercise: document.getElementById('btnSaveExercise'),
+      exerciseList: document.getElementById('exerciseList'),
+      toast: document.getElementById('toast'),
+    };
+
+    function enter() {
+      if (initialized) return;
+      initialized = true;
+      setup();
+      refreshCountBadge();
+    }
+
+    function setup() {
+      els.tabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+          els.tabs.forEach(t => t.classList.remove('active'));
+          tab.classList.add('active');
+          const target = tab.dataset.tab;
+          els.tabCreate.style.display = target === 'create' ? 'block' : 'none';
+          els.tabList.style.display = target === 'list' ? 'block' : 'none';
+          if (target === 'list') loadExerciseList();
+        });
+      });
+
+      els.btnAddAudio.addEventListener('click', () => addAudioRow());
+      addAudioRow(true);
+      addAudioRow(false);
+
+      els.btnSaveExercise.addEventListener('click', handleSave);
+    }
+
+    function addAudioRow(isCorrectDefault = false) {
+      audioRowCount++;
+      const id = audioRowCount;
+      const row = document.createElement('div');
+      row.className = 'audio-input-row';
+      row.dataset.rowId = id;
+      row.innerHTML = `
+        <div class="file-field">
+          <input type="text" placeholder="Etiqueta interna (ej: Fuente con peras)" data-role="label" />
+          <input type="file" accept="audio/*" data-role="file" />
+        </div>
+        <label class="correct-toggle ${isCorrectDefault ? 'is-correct' : ''}">
+          <input type="radio" name="correctAudio" data-role="correct" ${isCorrectDefault ? 'checked' : ''} />
+          Correcta
+        </label>
+        <button class="icon-btn small danger" type="button" data-role="remove" title="Quitar alternativa">✕</button>
+      `;
+      els.audioInputsContainer.appendChild(row);
+
+      row.querySelector('[data-role=remove]').addEventListener('click', () => row.remove());
+      row.querySelector('[data-role=correct]').addEventListener('change', updateCorrectHighlight);
+    }
+
+    function updateCorrectHighlight() {
+      document.querySelectorAll('.audio-input-row').forEach(row => {
+        const checked = row.querySelector('[data-role=correct]').checked;
+        row.querySelector('.correct-toggle').classList.toggle('is-correct', checked);
+      });
+    }
+
+    async function handleSave() {
+      const title = els.inputTitle.value.trim();
+      const imageFile = els.inputImage.files[0];
+      const rows = Array.from(document.querySelectorAll('.audio-input-row'));
+
+      if (!imageFile) return showToast('Selecciona una imagen para el ejercicio.', 'error');
+      if (rows.length < 2) return showToast('Agrega al menos dos alternativas de audio.', 'error');
+
+      const audiosToUpload = rows.map(row => ({
+        file: row.querySelector('[data-role=file]').files[0],
+        label: row.querySelector('[data-role=label]').value.trim(),
+        isCorrect: row.querySelector('[data-role=correct]').checked,
+      }));
+
+      if (audiosToUpload.some(a => !a.file)) {
+        return showToast('Falta el archivo de audio en alguna alternativa.', 'error');
+      }
+      if (!audiosToUpload.some(a => a.isCorrect)) {
+        return showToast('Marca cuál alternativa es la correcta.', 'error');
+      }
+
+      setSaving(true);
+      try {
+        const imageUrl = await DataService.uploadFile(BUCKETS.IMAGES, imageFile);
+
+        const audios = [];
+        for (const a of audiosToUpload) {
+          const url = await DataService.uploadFile(BUCKETS.AUDIOS, a.file);
+          audios.push({ url, label: a.label, isCorrect: a.isCorrect });
+        }
+
+        await DataService.createExercise({
+          activityType: ACTIVITY_TYPES.QUE_VEO,
+          imageUrl,
+          title,
+          audios,
+        });
+
+        showToast('Ejercicio guardado correctamente.', 'success');
+        resetForm();
+        refreshCountBadge();
+      } catch (err) {
+        console.error(err);
+        showToast('Ocurrió un error al guardar. Revisa la consola.', 'error');
+      } finally {
+        setSaving(false);
+      }
+    }
+
+    function resetForm() {
+      els.inputTitle.value = '';
+      els.inputImage.value = '';
+      els.audioInputsContainer.innerHTML = '';
+      addAudioRow(true);
+      addAudioRow(false);
+    }
+
+    function setSaving(isSaving) {
+      els.btnSaveExercise.disabled = isSaving;
+      els.btnSaveExercise.textContent = isSaving ? 'Guardando…' : 'Guardar ejercicio';
+    }
+
+    async function loadExerciseList() {
+      els.exerciseList.innerHTML = `<div class="loading-screen" style="min-height:120px;"><div class="spinner"></div></div>`;
+      try {
+        const exercises = await DataService.getExercises(ACTIVITY_TYPES.QUE_VEO);
+        els.countBadge.textContent = exercises.length;
+
+        if (exercises.length === 0) {
+          els.exerciseList.innerHTML = `<div class="empty-screen" style="min-height:160px;"><p>Todavía no hay ejercicios creados.</p></div>`;
+          return;
+        }
+
+        els.exerciseList.innerHTML = exercises.map(renderExerciseRow).join('');
+
+        exercises.forEach(ex => {
+          document.getElementById(`del-${ex.id}`).addEventListener('click', () => handleDelete(ex.id));
+          document.getElementById(`edit-${ex.id}`).addEventListener('click', () => handleEditTitle(ex));
+        });
+      } catch (err) {
+        console.error(err);
+        els.exerciseList.innerHTML = `<div class="empty-screen"><p>Error al cargar los ejercicios.</p></div>`;
+      }
+    }
+
+    function renderExerciseRow(ex) {
+      const correctAudio = (ex.exercise_audios || []).find(a => a.is_correct);
+      return `
+        <div class="exercise-row">
+          <img src="${ex.image_url}" alt="" />
+          <div class="info">
+            <h4>${ex.title || '(sin nombre)'}</h4>
+            <p>${ex.exercise_audios.length} alternativas · correcta: ${correctAudio ? (correctAudio.label || 'sin etiqueta') : '—'}</p>
+          </div>
+          <div class="actions">
+            <button class="icon-btn small" id="edit-${ex.id}" title="Editar nombre">✎</button>
+            <button class="icon-btn small danger" id="del-${ex.id}" title="Eliminar">🗑</button>
+          </div>
+        </div>
+      `;
+    }
+
+    async function handleDelete(id) {
+      if (!confirm('¿Eliminar este ejercicio y sus audios? Esta acción no se puede deshacer.')) return;
+      try {
+        await DataService.deleteExercise(id);
+        showToast('Ejercicio eliminado.', 'success');
+        loadExerciseList();
+      } catch (err) {
+        console.error(err);
+        showToast('No se pudo eliminar el ejercicio.', 'error');
+      }
+    }
+
+    async function handleEditTitle(ex) {
+      const newTitle = prompt('Nuevo nombre del ejercicio:', ex.title || '');
+      if (newTitle === null) return;
+      try {
+        await DataService.updateExerciseTitle(ex.id, newTitle.trim());
+        showToast('Nombre actualizado.', 'success');
+        loadExerciseList();
+      } catch (err) {
+        console.error(err);
+        showToast('No se pudo actualizar el nombre.', 'error');
+      }
+    }
+
+    function showToast(message, type = '') {
+      els.toast.textContent = message;
+      els.toast.className = `toast show ${type}`;
+      setTimeout(() => { els.toast.className = 'toast'; }, 2800);
+    }
+
+    async function refreshCountBadge() {
+      try {
+        const list = await DataService.getExercises(ACTIVITY_TYPES.QUE_VEO);
+        els.countBadge.textContent = list.length;
+      } catch (e) { /* silencioso: solo afecta el contador */ }
+    }
+
+    return { enter };
+  })();
+  </script>
+
 </body>
 </html>
