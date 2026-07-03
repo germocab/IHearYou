@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1" />
+<title>Oye · Entrenamiento auditivo</title>
+<meta name="theme-color" content="#7C3AED" />
+<link rel="manifest" href="manifest.json" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <div class="home-screen">
+
+      <div class="home-logo">
+        <div class="mark">👂</div>
+        <div class="wordmark">Oye</div>
+      </div>
+
+      <div class="home-hero">
+        <h1>Entrena tu oído,<br>a tu ritmo.</h1>
+        <p>Escucha, compara y elige. Cada ejercicio te ayuda a reconocer sonidos del habla de forma divertida.</p>
+      </div>
+
+      <div class="activity-card" id="btnQueVeo">
+        <div class="icon">👁️</div>
+        <div class="body">
+          <h3>¿Qué veo?</h3>
+          <p>Escucha dos audios y elige el que corresponde a la imagen.</p>
+        </div>
+        <div class="chevron">›</div>
+      </div>
+
+      <div class="activity-card locked">
+        <div class="icon">🎧</div>
+        <div class="body">
+          <h3>Próximamente</h3>
+          <p>Nuevas actividades de entrenamiento auditivo.</p>
+        </div>
+        <div class="chevron">🔒</div>
+      </div>
+
+      <div class="home-footer-link">
+        <a href="admin.html">Panel de administración</a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    document.getElementById('btnQueVeo').addEventListener('click', () => {
+      window.location.href = 'activity.html';
+    });
+  </script>
+</body>
+</html>

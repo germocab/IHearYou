@@ -1,0 +1,11 @@
+{
+  "name": "Oye · Entrenamiento auditivo",
+  "short_name": "Oye",
+  "description": "Actividades de entrenamiento auditivo para personas con dificultades auditivas.",
+  "start_url": "index.html",
+  "display": "standalone",
+  "background_color": "#FFFFFF",
+  "theme_color": "#7C3AED",
+  "orientation": "portrait",
+  "icons": []
+}
