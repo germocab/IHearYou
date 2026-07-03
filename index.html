@@ -143,6 +143,188 @@ a{ color:inherit; }
 }
 
 /* ==========================================================
+   MARCADOR DE PUNTOS Y PROGRESO (GAMIFICACIÓN)
+========================================================== */
+.score-row{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  padding: 0 16px 10px;
+}
+.score-pill{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  background: linear-gradient(135deg, var(--color-primary-light), #fff);
+  box-shadow: inset 0 0 0 1.5px var(--color-primary-light);
+  border-radius: var(--radius-pill);
+  padding: 5px 12px 5px 8px;
+  font-family: var(--font-display);
+  font-weight:700;
+  font-size:14px;
+  color: var(--color-primary-dark);
+  transition: transform .18s cubic-bezier(.34,1.56,.64,1);
+}
+.score-pill .star-icon{
+  font-size:16px;
+  filter: drop-shadow(0 1px 1px rgba(0,0,0,.12));
+}
+.score-pill.bump{ transform: scale(1.18); }
+
+.question-counter{
+  font-family: var(--font-display);
+  font-weight:600;
+  font-size:13px;
+  color: var(--color-text-muted);
+}
+
+.streak-pill{
+  display:flex;
+  align-items:center;
+  gap:4px;
+  background: var(--color-orange-light);
+  color: var(--color-orange);
+  border-radius: var(--radius-pill);
+  padding: 4px 10px;
+  font-family: var(--font-display);
+  font-weight:700;
+  font-size:12px;
+  opacity:0;
+  transform: scale(0.7);
+  transition: all .25s cubic-bezier(.34,1.56,.64,1);
+}
+.streak-pill.show{ opacity:1; transform: scale(1); }
+
+/* Puntos flotantes al responder correctamente */
+.points-float{
+  position:absolute;
+  left:50%;
+  top:0;
+  transform: translate(-50%, 0);
+  font-family: var(--font-display);
+  font-weight:800;
+  font-size:26px;
+  color: var(--color-success);
+  text-shadow: 0 2px 6px rgba(31,163,76,.25);
+  pointer-events:none;
+  opacity:0;
+  z-index:50;
+  white-space:nowrap;
+}
+.points-float.animate{
+  animation: pointsFloatUp 1.1s ease forwards;
+}
+@keyframes pointsFloatUp{
+  0%{ opacity:0; transform: translate(-50%, 10px) scale(0.6); }
+  15%{ opacity:1; transform: translate(-50%, -10px) scale(1.15); }
+  30%{ transform: translate(-50%, -14px) scale(1); }
+  75%{ opacity:1; transform: translate(-50%, -55px) scale(1); }
+  100%{ opacity:0; transform: translate(-50%, -80px) scale(0.9); }
+}
+
+/* Confeti */
+.confetti-piece{
+  position:fixed;
+  top:-12px;
+  width:9px; height:9px;
+  border-radius:2px;
+  pointer-events:none;
+  z-index:999;
+  opacity:0.95;
+  animation: confettiFall linear forwards;
+}
+@keyframes confettiFall{
+  0%{ transform: translateY(0) rotate(0deg); opacity:1; }
+  100%{ transform: translateY(105vh) rotate(540deg); opacity:0.4; }
+}
+
+/* Destello de acierto sobre la tarjeta de imagen */
+@keyframes correctPulse{
+  0%{ box-shadow: 0 0 0 0 rgba(31,163,76,.45); }
+  70%{ box-shadow: 0 0 0 18px rgba(31,163,76,0); }
+  100%{ box-shadow: 0 0 0 0 rgba(31,163,76,0); }
+}
+.image-card.celebrate{ animation: correctPulse .8s ease; }
+
+/* ==========================================================
+   PANTALLA DE RESULTADOS FINALES
+========================================================== */
+.complete-screen{
+  flex:1;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  padding: 20px 24px 40px;
+  gap:6px;
+}
+.complete-screen .trophy{
+  font-size:56px;
+  margin-bottom:4px;
+  animation: trophyPop .6s cubic-bezier(.34,1.56,.64,1);
+}
+@keyframes trophyPop{
+  0%{ transform: scale(0) rotate(-15deg); opacity:0; }
+  70%{ transform: scale(1.15) rotate(6deg); opacity:1; }
+  100%{ transform: scale(1) rotate(0deg); }
+}
+.complete-screen h1{
+  font-family: var(--font-display);
+  font-size:22px;
+  color: var(--color-text);
+  margin:0;
+}
+.complete-screen .complete-sub{
+  color: var(--color-text-muted);
+  font-size:14px;
+  margin-bottom:6px;
+}
+.complete-score{
+  font-family: var(--font-display);
+  font-weight:800;
+  font-size:44px;
+  color: var(--color-primary);
+  margin: 10px 0 2px;
+}
+.complete-score span{ font-size:18px; color: var(--color-text-muted); font-weight:600; }
+.complete-stars{
+  font-size:30px;
+  letter-spacing:4px;
+  margin-bottom:10px;
+}
+.complete-stars .star-off{ opacity:.25; filter:grayscale(1); }
+.complete-stats{
+  display:flex;
+  gap:22px;
+  margin: 8px 0 26px;
+}
+.complete-stat{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:2px;
+}
+.complete-stat .value{
+  font-family: var(--font-display);
+  font-weight:700;
+  font-size:18px;
+  color: var(--color-text);
+}
+.complete-stat .label{
+  font-size:11px;
+  color: var(--color-text-muted);
+}
+.complete-actions{
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+  width:100%;
+  max-width:280px;
+}
+
+/* ==========================================================
    CONTENIDO
 ========================================================== */
 .screen-content{
@@ -184,6 +366,7 @@ a{ color:inherit; }
    TARJETA DE IMAGEN
 ========================================================== */
 .image-card{
+  position: relative;
   background: var(--color-surface);
   border-radius: var(--radius-lg);
   aspect-ratio: 1 / 0.82;
@@ -715,10 +898,15 @@ a{ color:inherit; }
           <button class="icon-btn" id="btnRepeatHint" aria-label="Ayuda" title="Escucha ambos audios antes de responder">?</button>
         </div>
       </div>
-      <div class="points-badge" id="pointsBadge" style="display:none;">+5 puntos</div>
+      <div class="score-row">
+        <div class="question-counter" id="questionCounter">Pregunta 1 de 5</div>
+        <div class="streak-pill" id="streakPill">🔥 <span id="streakValue">0</span></div>
+        <div class="score-pill" id="scorePill"><span class="star-icon">⭐</span><span id="scoreValue">0</span> pts</div>
+      </div>
+      <div class="points-badge" id="pointsBadge" style="display:none;">+10 puntos</div>
 
       <div class="screen-content" id="screenContent">
-        <!-- Se renderiza dinámicamente: loading / ejercicio / vacío -->
+        <!-- Se renderiza dinámicamente: loading / ejercicio / vacío / resultados -->
       </div>
     </div>
   </div>
@@ -970,6 +1158,10 @@ a{ color:inherit; }
   // LÓGICA DE LA ACTIVIDAD "¿QUÉ VEO?"
   // ============================================================
   const ActivityScreen = (() => {
+    const TOTAL_QUESTIONS = 5;
+    const POINTS_PER_QUESTION = 10;
+    const STREAK_BONUS = 2; // puntos extra por cada acierto consecutivo a partir del 2º
+
     const state = {
       currentExercise: null,
       lastExerciseId: null,
@@ -979,24 +1171,47 @@ a{ color:inherit; }
       totalCount: 0,
       currentAudio: null,
       initialized: false,
+      questionIndex: 0,   // 0-based, pregunta actual dentro de la sesión
+      score: 0,            // puntos acumulados en la sesión
+      streak: 0,           // aciertos consecutivos
     };
 
     const els = {
       content: document.getElementById('screenContent'),
       progressFill: document.getElementById('progressFill'),
       pointsBadge: document.getElementById('pointsBadge'),
+      scorePill: document.getElementById('scorePill'),
+      scoreValue: document.getElementById('scoreValue'),
+      questionCounter: document.getElementById('questionCounter'),
+      streakPill: document.getElementById('streakPill'),
+      streakValue: document.getElementById('streakValue'),
     };
 
     // Se llama cada vez que se entra a la pantalla de actividad.
     function enter() {
+      // Reinicia la sesión de juego cada vez que se abre la actividad.
+      state.questionIndex = 0;
+      state.score = 0;
+      state.streak = 0;
+      state.correctCount = 0;
+      state.totalCount = 0;
+      state.lastExerciseId = null;
+      updateScoreDisplay(false);
+      updateStreakDisplay();
       loadNextExercise();
     }
 
     async function loadNextExercise() {
+      if (state.questionIndex >= TOTAL_QUESTIONS) {
+        renderComplete();
+        return;
+      }
+
       state.answered = false;
       state.selectedIndex = null;
       els.pointsBadge.style.display = 'none';
-      updateProgress(0);
+      els.questionCounter.textContent = `Pregunta ${state.questionIndex + 1} de ${TOTAL_QUESTIONS}`;
+      updateProgress((state.questionIndex / TOTAL_QUESTIONS) * 100);
       renderLoading();
 
       try {
@@ -1173,7 +1388,7 @@ a{ color:inherit; }
       state.totalCount++;
       if (isCorrect) state.correctCount++;
 
-      updateProgress(100);
+      updateProgress(((state.questionIndex + 1) / TOTAL_QUESTIONS) * 100);
 
       document.querySelectorAll('.audio-option').forEach(btn => {
         if (btn !== selectedBtn) {
@@ -1186,23 +1401,135 @@ a{ color:inherit; }
 
       const banner = document.getElementById('feedbackBanner');
       const caption = document.getElementById('feedbackCaption');
+      const imageCard = document.querySelector('.image-card');
 
       if (isCorrect) {
+        state.streak++;
+        const bonus = state.streak > 1 ? STREAK_BONUS * (state.streak - 1) : 0;
+        const earned = POINTS_PER_QUESTION + bonus;
+        state.score += earned;
+
         banner.className = 'feedback-banner correct show';
-        banner.innerHTML = '✅ Correcto';
+        banner.innerHTML = '✅ ¡Correcto!';
         caption.className = 'feedback-caption show';
         caption.textContent = exercise.title ? `Esta es ${exercise.title}` : '¡Muy bien!';
+
         els.pointsBadge.style.display = 'block';
+        els.pointsBadge.textContent = bonus > 0 ? `+${earned} puntos (racha x${state.streak})` : `+${earned} puntos`;
+
+        if (imageCard) imageCard.classList.add('celebrate');
+        showFloatingPoints(earned, imageCard);
+        spawnConfetti();
+        updateScoreDisplay(true);
+        updateStreakDisplay();
       } else {
+        state.streak = 0;
         banner.className = 'feedback-banner incorrect show';
         banner.innerHTML = '⚠️ Ups, intenta de nuevo';
+        updateStreakDisplay();
       }
 
+      state.questionIndex++;
       setTimeout(loadNextExercise, 1700);
     }
 
     function updateProgress(pct) {
       els.progressFill.style.width = `${pct}%`;
+    }
+
+    function updateScoreDisplay(animate) {
+      els.scoreValue.textContent = state.score;
+      if (animate) {
+        els.scorePill.classList.remove('bump');
+        // Forzar reflow para reiniciar la animación
+        void els.scorePill.offsetWidth;
+        els.scorePill.classList.add('bump');
+        setTimeout(() => els.scorePill.classList.remove('bump'), 220);
+      }
+    }
+
+    function updateStreakDisplay() {
+      els.streakValue.textContent = state.streak;
+      els.streakPill.classList.toggle('show', state.streak >= 2);
+    }
+
+    function showFloatingPoints(amount, anchorEl) {
+      const container = anchorEl || els.content;
+      const float = document.createElement('div');
+      float.className = 'points-float';
+      float.textContent = `+${amount}`;
+      container.appendChild(float);
+      requestAnimationFrame(() => float.classList.add('animate'));
+      setTimeout(() => float.remove(), 1200);
+    }
+
+    function spawnConfetti() {
+      const colors = ['#7C3AED', '#F5841F', '#2E7DF5', '#1FA34C', '#A78BFA'];
+      const count = 26;
+      for (let i = 0; i < count; i++) {
+        const piece = document.createElement('div');
+        piece.className = 'confetti-piece';
+        const color = colors[Math.floor(Math.random() * colors.length)];
+        piece.style.background = color;
+        piece.style.left = `${Math.random() * 100}vw`;
+        piece.style.borderRadius = Math.random() > 0.5 ? '50%' : '2px';
+        const duration = 1.4 + Math.random() * 1.1;
+        piece.style.animationDuration = `${duration}s`;
+        piece.style.animationDelay = `${Math.random() * 0.15}s`;
+        document.body.appendChild(piece);
+        setTimeout(() => piece.remove(), (duration + 0.2) * 1000);
+      }
+    }
+
+    function renderComplete() {
+      const total = TOTAL_QUESTIONS;
+      const correct = state.correctCount;
+      const maxScore = POINTS_PER_QUESTION * total;
+      const ratio = correct / total;
+
+      let starsCount = 1;
+      if (ratio >= 1) starsCount = 3;
+      else if (ratio >= 0.6) starsCount = 2;
+
+      const starsHtml = Array.from({ length: 3 })
+        .map((_, i) => `<span class="${i < starsCount ? '' : 'star-off'}">⭐</span>`)
+        .join('');
+
+      let message = '¡Sigue practicando, cada intento suma!';
+      if (ratio >= 1) message = '¡Puntaje perfecto! Eres un experto escuchando.';
+      else if (ratio >= 0.6) message = '¡Muy buen trabajo! Estás mejorando mucho.';
+
+      els.content.innerHTML = `
+        <div class="complete-screen">
+          <div class="trophy">🏆</div>
+          <h1>¡Actividad completada!</h1>
+          <p class="complete-sub">${message}</p>
+          <div class="complete-score">${state.score}<span> / ${maxScore} pts</span></div>
+          <div class="complete-stars">${starsHtml}</div>
+          <div class="complete-stats">
+            <div class="complete-stat">
+              <div class="value">${correct}/${total}</div>
+              <div class="label">Correctas</div>
+            </div>
+            <div class="complete-stat">
+              <div class="value">${state.score}</div>
+              <div class="label">Puntos</div>
+            </div>
+          </div>
+          <div class="complete-actions">
+            <button class="btn btn-primary" id="btnPlayAgain">Jugar de nuevo</button>
+            <button class="btn btn-secondary" id="btnBackHome">Volver al inicio</button>
+          </div>
+        </div>
+      `;
+
+      updateProgress(100);
+      els.questionCounter.textContent = '¡Completado!';
+
+      if (ratio >= 0.6) spawnConfetti();
+
+      document.getElementById('btnPlayAgain').addEventListener('click', () => enter());
+      document.getElementById('btnBackHome').addEventListener('click', () => showPage('home'));
     }
 
     return { enter };
