@@ -1,4 +1,8 @@
 <!DOCTYPE html>
+<!-- Oye · Entrenamiento auditivo — v1.1-alpha
+     Novedades: mapa de unidades, vocabulario por unidad, panel de
+     administración con acceso por contraseña, y 3 actividades por
+     unidad ("¿Cuál está bien?", "¿Qué veo?", "¿Qué dice?"). -->
 <html lang="es">
 <head>
 <meta charset="UTF-8" />
@@ -660,6 +664,118 @@ a{ color:inherit; }
   font-size:18px;
 }
 
+/* ==========================================================
+   MAPA DE UNIDADES (v1.1-alpha)
+========================================================== */
+.units-map{
+  display:flex;
+  flex-direction:column;
+  gap:16px;
+  padding: 6px 4px 10px;
+}
+.unit-node{
+  display:flex;
+  align-items:center;
+  gap:14px;
+  cursor:pointer;
+  transition: transform .12s ease;
+}
+.unit-node:active{ transform: scale(0.98); }
+.unit-circle{
+  width:56px; height:56px;
+  border-radius:50%;
+  color:#fff;
+  display:flex; align-items:center; justify-content:center;
+  font-family: var(--font-display);
+  font-size:20px;
+  flex-shrink:0;
+  box-shadow: var(--shadow-card);
+}
+.unit-node-text h3{
+  margin:0 0 2px;
+  font-family: var(--font-display);
+  font-size:15.5px;
+  color: var(--color-text);
+}
+.unit-node-text p{
+  margin:0;
+  font-size:12.5px;
+  color: var(--color-text-muted);
+}
+
+.unit-video{
+  width:100%;
+  border-radius: var(--radius-lg);
+  margin: 4px 0 16px;
+  display:block;
+  background:#000;
+}
+
+.vocab-grid{
+  display:grid;
+  grid-template-columns: 1fr 1fr;
+  gap:12px;
+}
+.vocab-card{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:8px;
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding:12px;
+  box-shadow: var(--shadow-soft);
+  cursor:pointer;
+  font-family: inherit;
+}
+.vocab-card:active{ transform: scale(0.97); }
+.vocab-card img{
+  width:100%;
+  aspect-ratio: 1 / 1;
+  object-fit:cover;
+  border-radius: var(--radius-md);
+}
+.vocab-word{
+  font-family: var(--font-display);
+  font-size:14px;
+  color: var(--color-text);
+  text-transform:capitalize;
+}
+
+/* Opciones de texto (usadas en "¿Cuál está bien?" y "¿Qué dice?") */
+.text-option{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  width:100%;
+  background: var(--color-bg);
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding:14px 16px;
+  font-family: var(--font-display);
+  font-size:15px;
+  color: var(--color-text);
+  cursor:pointer;
+  margin-bottom:10px;
+  text-align:left;
+}
+.text-option.selected{ border-color: var(--color-primary); background: var(--color-primary-light); }
+.text-option.state-correct{ border-color: var(--color-success); background: var(--color-success-light); }
+.text-option.state-incorrect{ border-color: var(--color-error); background: var(--color-error-light); }
+.prompt-audio-card{
+  display:flex; align-items:center; justify-content:center; gap:10px;
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+  border-radius: var(--radius-lg);
+  padding:26px 16px;
+  margin-bottom:18px;
+  cursor:pointer;
+  font-family: var(--font-display);
+  font-size:15px;
+}
+.prompt-audio-card svg{ width:26px; height:26px; }
+
 .home-footer-link{
   margin-top:auto;
   text-align:center;
@@ -1234,17 +1350,12 @@ a{ color:inherit; }
         <div class="home-screen">
 
           <div class="home-hero" style="margin-top:10px;">
-            <h1>Actividades</h1>
-            <p>Escucha, compara y elige. Cada ejercicio te ayuda a reconocer sonidos del habla de forma divertida.</p>
+            <h1>Mapa de unidades</h1>
+            <p>Elige una unidad para aprender vocabulario nuevo y practicar tu oído con sus actividades.</p>
           </div>
 
-          <div class="activity-card" id="btnQueVeo">
-            <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:26px;height:26px;"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg></div>
-            <div class="body">
-              <h3>¿Qué veo?</h3>
-              <p>Escucha dos audios y elige el que corresponde a la imagen.</p>
-            </div>
-            <div class="chevron">›</div>
+          <div id="unitsMapContainer">
+            <!-- Se renderiza dinámicamente: mapa de unidades -->
           </div>
 
           <div class="home-footer-link">
@@ -1256,13 +1367,75 @@ a{ color:inherit; }
       <nav class="tab-bar" id="tabBarHome">
         <button class="tab-bar-btn active" data-tab="home">
           <span class="tab-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5 12 3l9 6.5"/><path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10"/></svg></span>
-          <span class="tab-label">Actividades</span>
+          <span class="tab-label">Unidades</span>
         </button>
         <button class="tab-bar-btn" data-tab="profile">
           <span class="tab-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.5-7 8-7s8 3 8 7"/></svg></span>
           <span class="tab-label">Mi Perfil</span>
         </button>
       </nav>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       PÁGINA: UNIDAD (video, vocabulario y las 3 actividades)
+       v1.1-alpha
+  ============================================================ -->
+  <div class="page" id="page-unit">
+    <div class="app-shell">
+      <div class="topbar">
+        <button class="icon-btn" id="btnCloseUnit" aria-label="Volver al mapa"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px;"><path d="M18 6 6 18"/><path d="M6 6l12 12"/></svg></button>
+        <div style="flex:1;"></div>
+      </div>
+      <div class="page-scroll">
+        <div class="home-screen" id="unitScreenContent">
+          <!-- Se renderiza dinámicamente -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       PÁGINA: VOCABULARIO DE LA UNIDAD
+       v1.1-alpha
+  ============================================================ -->
+  <div class="page" id="page-vocabulary">
+    <div class="app-shell">
+      <div class="topbar">
+        <button class="icon-btn" id="btnCloseVocabulary" aria-label="Volver a la unidad"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px;"><path d="M18 6 6 18"/><path d="M6 6l12 12"/></svg></button>
+        <div style="flex:1;"></div>
+      </div>
+      <div class="page-scroll">
+        <div class="home-screen" id="vocabularyScreenContent">
+          <!-- Se renderiza dinámicamente -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       PÁGINA: INICIO DE SESIÓN DEL PANEL DE ADMINISTRACIÓN
+       v1.1-alpha — correo (libre) + contraseña única "escucha"
+  ============================================================ -->
+  <div class="page" id="page-admin-login">
+    <div class="app-shell">
+      <div class="topbar">
+        <button class="icon-btn" id="btnCloseAdminLogin" aria-label="Volver al inicio"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px;"><path d="M18 6 6 18"/><path d="M6 6l12 12"/></svg></button>
+        <div style="flex:1;"></div>
+      </div>
+      <div class="page-scroll">
+        <div class="home-screen">
+          <div class="name-gate-card" style="margin:24px auto; max-width:340px;">
+            <div class="name-gate-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="9" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg></div>
+            <h2>Panel de administración</h2>
+            <p>Ingresa con tu correo electrónico y la contraseña del panel.</p>
+            <input type="email" id="inputAdminEmail" placeholder="Correo electrónico" autocomplete="off" />
+            <input type="password" id="inputAdminPassword" placeholder="Contraseña" autocomplete="off" style="margin-top:10px;" />
+            <div class="hint" id="adminLoginError" style="color:var(--color-error); display:none; margin-top:6px;">Contraseña incorrecta.</div>
+            <button class="btn btn-primary" id="btnAdminLoginSubmit" style="margin-top:14px;">Ingresar</button>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -1329,27 +1502,93 @@ a{ color:inherit; }
       </div>
 
       <div class="admin-tabs">
-        <button class="admin-tab active" data-tab="create">Nuevo ejercicio</button>
+        <button class="admin-tab active" data-tab="units">Unidades</button>
+        <button class="admin-tab" data-tab="vocab">Vocabulario</button>
+        <button class="admin-tab" data-tab="create">Nuevo ejercicio</button>
         <button class="admin-tab" data-tab="list">Ejercicios (<span id="countBadge">0</span>)</button>
       </div>
 
-      <!-- ============ TAB: CREAR EJERCICIO ============ -->
-      <section id="tab-create">
+      <!-- ============ TAB: UNIDADES (v1.1-alpha) ============ -->
+      <section id="tab-units">
         <div class="form-card">
+          <div class="form-group">
+            <label>Nombre de la unidad</label>
+            <input type="text" id="inputUnitName" placeholder="Ej: Frutas" />
+          </div>
+          <div class="form-group">
+            <label>Descripción breve (opcional)</label>
+            <input type="text" id="inputUnitDescription" placeholder="Ej: Aprende los nombres de frutas comunes" />
+          </div>
+          <div class="form-group">
+            <label>Video introductorio (opcional)</label>
+            <input type="file" id="inputUnitVideo" accept="video/*" />
+            <div class="hint">Formatos permitidos: MP4, WEBM.</div>
+          </div>
+          <button class="btn btn-primary" id="btnSaveUnit" style="margin-top:10px;">Guardar unidad</button>
+        </div>
+        <div id="unitList" style="margin-top:16px;"></div>
+      </section>
+
+      <!-- ============ TAB: VOCABULARIO (v1.1-alpha) ============ -->
+      <section id="tab-vocab" style="display:none;">
+        <div class="form-card">
+          <div class="form-group">
+            <label>Unidad</label>
+            <select id="selectVocabUnit"></select>
+          </div>
+          <div class="form-group">
+            <label>Palabra</label>
+            <input type="text" id="inputVocabWord" placeholder="Ej: manzana" />
+          </div>
+          <div class="form-group">
+            <label>Imagen de la palabra</label>
+            <input type="file" id="inputVocabImage" accept="image/*" />
+          </div>
+          <div class="form-group">
+            <label>Audio de la palabra</label>
+            <input type="file" id="inputVocabAudio" accept="audio/*" />
+          </div>
+          <button class="btn btn-primary" id="btnSaveVocabWord" style="margin-top:10px;">Guardar palabra</button>
+        </div>
+        <div id="vocabList" style="margin-top:16px;"></div>
+      </section>
+
+      <!-- ============ TAB: CREAR EJERCICIO ============ -->
+      <section id="tab-create" style="display:none;">
+        <div class="form-card">
+          <div class="form-group">
+            <label>Unidad</label>
+            <select id="selectExerciseUnit"></select>
+          </div>
+
+          <div class="form-group">
+            <label>Actividad</label>
+            <select id="selectActivityType">
+              <option value="cual_esta_bien">¿Cuál está bien?</option>
+              <option value="que_veo">¿Qué veo?</option>
+              <option value="que_dice">¿Qué dice?</option>
+            </select>
+          </div>
+
           <div class="form-group">
             <label>Nombre del ejercicio (opcional, se usa como retroalimentación)</label>
             <input type="text" id="inputTitle" placeholder="Ej: una fuente con manzanas" />
             <div class="hint">Se mostrará como "Esta es [nombre]" al responder correctamente.</div>
           </div>
 
-          <div class="form-group">
+          <div class="form-group" id="groupImage">
             <label>Imagen del ejercicio</label>
             <input type="file" id="inputImage" accept="image/*" />
             <div class="hint">Formatos permitidos: JPG, PNG, WEBP.</div>
           </div>
 
+          <div class="form-group" id="groupPromptAudio" style="display:none;">
+            <label>Audio de la pregunta (palabra o frase que se escuchará)</label>
+            <input type="file" id="inputPromptAudio" accept="audio/*" />
+          </div>
+
           <div class="form-group">
-            <label>Alternativas de audio</label>
+            <label id="labelAlternatives">Alternativas de audio</label>
             <div id="audioInputsContainer"></div>
             <button class="btn btn-secondary" id="btnAddAudio" type="button" style="margin-top:6px;">+ Agregar alternativa</button>
             <div class="hint" style="margin-top:8px;">Formatos compatibles: MP3, M4A, WAV, OGG. Si un audio no suena tras subirlo, vuelve a subirlo (los archivos cargados antes de esta actualización pueden haber quedado con el formato mal etiquetado).</div>
@@ -1363,6 +1602,10 @@ a{ color:inherit; }
 
       <!-- ============ TAB: LISTA DE EJERCICIOS ============ -->
       <section id="tab-list" style="display:none;">
+        <div class="form-group">
+          <label>Filtrar por unidad</label>
+          <select id="selectListUnit"><option value="">Todas las unidades</option></select>
+        </div>
         <div id="exerciseList"></div>
       </section>
 
@@ -1386,16 +1629,40 @@ a{ color:inherit; }
   const TABLES = {
     EXERCISES: 'exercises',
     AUDIOS: 'exercise_audios',
+    UNITS: 'units',
+    VOCAB: 'unit_vocabulary',
   };
 
   const BUCKETS = {
     IMAGES: 'images',
     AUDIOS: 'audios',
+    VIDEOS: 'videos',
   };
 
   const ACTIVITY_TYPES = {
+    CUAL_ESTA_BIEN: 'cual_esta_bien',
     QUE_VEO: 'que_veo',
+    QUE_DICE: 'que_dice',
   };
+
+  // Metadatos de cada actividad (usados tanto en la pantalla de unidad
+  // como en el panel de administración).
+  const ACTIVITY_META = {
+    [ACTIVITY_TYPES.CUAL_ESTA_BIEN]: { label: '¿Cuál está bien?', order: 1, optionMode: 'text', promptKind: 'audio' },
+    [ACTIVITY_TYPES.QUE_VEO]:        { label: '¿Qué veo?',        order: 2, optionMode: 'audio', promptKind: 'image' },
+    [ACTIVITY_TYPES.QUE_DICE]:       { label: '¿Qué dice?',       order: 3, optionMode: 'text', promptKind: 'audio' },
+  };
+
+  // ============================================================
+  // VERSIÓN DE LA APP
+  // ============================================================
+  const APP_VERSION = '1.1-alpha';
+
+  // Contraseña única del panel de administración (v1.1-alpha).
+  // El correo se pide solo como identificación; no se valida contra
+  // una base de usuarios todavía.
+  const ADMIN_PASSWORD = 'escucha';
+  const ADMIN_SESSION_KEY = 'oye_admin_authed_v1';
 
   // ============================================================
   // ÍCONOS (SVG en línea, estilo trazo, heredan color con currentColor)
@@ -1434,40 +1701,53 @@ a{ color:inherit; }
   // ============================================================
   const DataService = {
 
-    async getExercises(activityType = ACTIVITY_TYPES.QUE_VEO) {
-      const { data, error } = await supabaseClient
+    // unitId es opcional por compatibilidad con ejercicios creados antes
+    // de v1.1-alpha (sin unidad asignada). Si se entrega, filtra también
+    // por unidad.
+    async getExercises(activityType = ACTIVITY_TYPES.QUE_VEO, unitId = null) {
+      let query = supabaseClient
         .from(TABLES.EXERCISES)
         .select(`
-          id, activity_type, image_url, title, created_at,
+          id, activity_type, unit_id, option_mode, image_url, prompt_audio_url, title, created_at,
           exercise_audios ( id, audio_url, label, is_correct, position )
         `)
         .eq('activity_type', activityType)
         .order('created_at', { ascending: false });
 
+      if (unitId) query = query.eq('unit_id', unitId);
+
+      const { data, error } = await query;
       if (error) throw error;
       return data || [];
     },
 
-    async getExercisesInOrder(activityType = ACTIVITY_TYPES.QUE_VEO) {
+    async getExercisesInOrder(activityType = ACTIVITY_TYPES.QUE_VEO, unitId = null) {
       // Devuelve los ejercicios utilizables en el orden en que fueron
       // registrados (más antiguo primero), sin repetir ni mezclar.
-      const exercises = await this.getExercises(activityType);
+      const exercises = await this.getExercises(activityType, unitId);
       return exercises
         .filter(e => e.exercise_audios && e.exercise_audios.length >= 2)
         .sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
     },
 
-    async createExercise({ activityType, imageUrl, title, audios }) {
+    async createExercise({ unitId, activityType, optionMode, imageUrl, promptAudioUrl, title, audios }) {
       const { data: exercise, error: exErr } = await supabaseClient
         .from(TABLES.EXERCISES)
-        .insert({ activity_type: activityType, image_url: imageUrl, title })
+        .insert({
+          activity_type: activityType,
+          unit_id: unitId || null,
+          option_mode: optionMode || 'audio',
+          image_url: imageUrl || null,
+          prompt_audio_url: promptAudioUrl || null,
+          title,
+        })
         .select()
         .single();
       if (exErr) throw exErr;
 
       const rows = audios.map((a, i) => ({
         exercise_id: exercise.id,
-        audio_url: a.url,
+        audio_url: a.url || null,
         label: a.label || null,
         is_correct: !!a.isCorrect,
         position: i,
@@ -1477,6 +1757,78 @@ a{ color:inherit; }
       if (audErr) throw audErr;
 
       return exercise;
+    },
+
+    // --------------------------------------------------------
+    // UNIDADES (mapa de la app) — v1.1-alpha
+    // --------------------------------------------------------
+    async getUnits() {
+      const { data, error } = await supabaseClient
+        .from(TABLES.UNITS)
+        .select('id, name, description, video_url, color, position, created_at')
+        .order('position', { ascending: true })
+        .order('created_at', { ascending: true });
+      if (error) throw error;
+      return data || [];
+    },
+
+    async getUnit(unitId) {
+      const { data, error } = await supabaseClient
+        .from(TABLES.UNITS)
+        .select('id, name, description, video_url, color, position, created_at')
+        .eq('id', unitId)
+        .single();
+      if (error) throw error;
+      return data;
+    },
+
+    async createUnit({ name, description, videoUrl, color, position }) {
+      const { data, error } = await supabaseClient
+        .from(TABLES.UNITS)
+        .insert({ name, description: description || null, video_url: videoUrl || null, color: color || null, position: position || 0 })
+        .select()
+        .single();
+      if (error) throw error;
+      return data;
+    },
+
+    async updateUnit(unitId, fields) {
+      const { error } = await supabaseClient.from(TABLES.UNITS).update(fields).eq('id', unitId);
+      if (error) throw error;
+    },
+
+    async deleteUnit(unitId) {
+      const { error } = await supabaseClient.from(TABLES.UNITS).delete().eq('id', unitId);
+      if (error) throw error;
+    },
+
+    // --------------------------------------------------------
+    // VOCABULARIO POR UNIDAD — v1.1-alpha
+    // --------------------------------------------------------
+    async getVocabulary(unitId) {
+      const { data, error } = await supabaseClient
+        .from(TABLES.VOCAB)
+        .select('id, unit_id, word, image_url, audio_url, position, created_at')
+        .eq('unit_id', unitId)
+        .order('position', { ascending: true })
+        .order('created_at', { ascending: true });
+      if (error) throw error;
+      return data || [];
+    },
+
+    async createVocabWord({ unitId, word, imageUrl, audioUrl, position }) {
+      const { data, error } = await supabaseClient
+        .from(TABLES.VOCAB)
+        .insert({ unit_id: unitId, word, image_url: imageUrl || null, audio_url: audioUrl || null, position: position || 0 })
+        .select()
+        .single();
+      if (error) throw error;
+      return data;
+    },
+
+    async deleteVocabWord(wordId) {
+      const { error } = await supabaseClient.from(TABLES.VOCAB).delete().eq('id', wordId);
+      if (error) throw error;
     },
 
     async deleteExercise(exerciseId) {
@@ -1564,24 +1916,45 @@ a{ color:inherit; }
   // ============================================================
   const pages = {
     home: document.getElementById('page-home'),
+    unit: document.getElementById('page-unit'),
+    vocabulary: document.getElementById('page-vocabulary'),
     activity: document.getElementById('page-activity'),
+    'admin-login': document.getElementById('page-admin-login'),
     admin: document.getElementById('page-admin'),
     profile: document.getElementById('page-profile'),
   };
 
-  function showPage(name) {
+  // Guarda el último parámetro de navegación (p.ej. unitId/activityType)
+  // para que cada módulo de pantalla lo use en su enter().
+  let currentNavParams = {};
+
+  function showPage(name, params = {}) {
+    currentNavParams = params;
     Object.values(pages).forEach(p => p.classList.remove('active'));
     pages[name].classList.add('active');
     window.scrollTo(0, 0);
 
-    if (name === 'activity') ActivityScreen.enter();
+    if (name === 'home') HomeScreen.enter();
+    if (name === 'unit') UnitScreen.enter(params.unitId);
+    if (name === 'vocabulary') VocabularyScreen.enter(params.unitId);
+    if (name === 'activity') ActivityScreen.enter(params.unitId, params.activityType);
+    if (name === 'admin-login') AdminLoginScreen.enter();
     if (name === 'admin') AdminScreen.enter();
     if (name === 'profile') ProfileScreen.enter();
   }
 
-  document.getElementById('btnQueVeo').addEventListener('click', () => showPage('activity'));
-  document.getElementById('btnGoAdmin').addEventListener('click', () => showPage('admin'));
-  document.getElementById('btnCloseActivity').addEventListener('click', () => showPage('home'));
+  document.getElementById('btnGoAdmin').addEventListener('click', () => {
+    // Si ya se autenticó en esta sesión del navegador, entra directo.
+    if (sessionStorage.getItem(ADMIN_SESSION_KEY) === '1') {
+      showPage('admin');
+    } else {
+      showPage('admin-login');
+    }
+  });
+  document.getElementById('btnCloseUnit').addEventListener('click', () => showPage('home'));
+  document.getElementById('btnCloseVocabulary').addEventListener('click', () => showPage('unit', { unitId: currentNavParams.unitId }));
+  document.getElementById('btnCloseAdminLogin').addEventListener('click', () => showPage('home'));
+  document.getElementById('btnCloseActivity').addEventListener('click', () => showPage('unit', { unitId: currentNavParams.unitId }));
   document.getElementById('btnCloseAdmin').addEventListener('click', () => showPage('home'));
 
   document.querySelectorAll('.tab-bar-btn').forEach(btn => {
@@ -1753,12 +2126,236 @@ a{ color:inherit; }
 
   <script>
   // ============================================================
+  // PANTALLA DE INICIO — MAPA DE UNIDADES (v1.1-alpha)
+  // ============================================================
+  const HomeScreen = (() => {
+    const els = { container: document.getElementById('unitsMapContainer') };
+    const UNIT_COLORS = ['#EC1D9C', '#1FA34C', '#7C3AED', '#2E7DF5', '#F5841F'];
+
+    async function enter() {
+      els.container.innerHTML = `<div class="loading-screen" style="min-height:160px;"><div class="spinner"></div></div>`;
+      try {
+        const units = await DataService.getUnits();
+        if (units.length === 0) {
+          els.container.innerHTML = `
+            <div class="empty-screen">
+              <div>${ICONS.folder}</div>
+              <p><strong>Aún no hay unidades creadas.</strong><br>Agrega la primera unidad desde el panel de administración.</p>
+            </div>`;
+          return;
+        }
+        els.container.innerHTML = `<div class="units-map">${units.map((u, i) => renderUnitCircle(u, i)).join('')}</div>`;
+        units.forEach((u, i) => {
+          document.getElementById(`unit-${u.id}`).addEventListener('click', () => showPage('unit', { unitId: u.id }));
+        });
+      } catch (err) {
+        console.error(err);
+        els.container.innerHTML = `<div class="empty-screen"><p>No se pudieron cargar las unidades.</p></div>`;
+      }
+    }
+
+    function renderUnitCircle(unit, index) {
+      const color = unit.color || UNIT_COLORS[index % UNIT_COLORS.length];
+      return `
+        <div class="unit-node" id="unit-${unit.id}">
+          <div class="unit-circle" style="background:${color};">${index + 1}</div>
+          <div class="unit-node-text">
+            <h3>${unit.name}</h3>
+            ${unit.description ? `<p>${unit.description}</p>` : ''}
+          </div>
+        </div>
+      `;
+    }
+
+    return { enter };
+  })();
+  </script>
+
+  <script>
+  // ============================================================
+  // PANTALLA DE UNIDAD — video, vocabulario y las 3 actividades
+  // v1.1-alpha
+  // ============================================================
+  const UnitScreen = (() => {
+    const els = { content: document.getElementById('unitScreenContent') };
+
+    async function enter(unitId) {
+      els.content.innerHTML = `<div class="loading-screen" style="min-height:160px;"><div class="spinner"></div></div>`;
+      if (!unitId) {
+        els.content.innerHTML = `<div class="empty-screen"><p>No se encontró la unidad.</p></div>`;
+        return;
+      }
+      try {
+        const unit = await DataService.getUnit(unitId);
+        render(unit);
+      } catch (err) {
+        console.error(err);
+        els.content.innerHTML = `<div class="empty-screen"><p>No se pudo cargar la unidad.</p></div>`;
+      }
+    }
+
+    function render(unit) {
+      const videoHtml = unit.video_url
+        ? `<video class="unit-video" src="${unit.video_url}" controls playsinline></video>`
+        : '';
+
+      const activityRows = Object.values(ACTIVITY_META)
+        .sort((a, b) => a.order - b.order)
+        .map(meta => `
+          <div class="activity-card" data-activity="${Object.keys(ACTIVITY_META).find(k => ACTIVITY_META[k] === meta)}">
+            <div class="icon">${meta.order}</div>
+            <div class="body">
+              <h3>${meta.order + 1}. ${meta.label}</h3>
+              <p>Practica la actividad "${meta.label}" de esta unidad.</p>
+            </div>
+            <div class="chevron">›</div>
+          </div>
+        `).join('');
+
+      els.content.innerHTML = `
+        <div class="home-hero" style="margin-top:10px;">
+          <h1>${unit.name}</h1>
+          ${unit.description ? `<p>${unit.description}</p>` : ''}
+        </div>
+        ${videoHtml}
+        <div class="activity-card" id="unitBtnVocabulario">
+          <div class="icon">${iconSized('eye', 22)}</div>
+          <div class="body">
+            <h3>1. Vocabulario</h3>
+            <p>Primero, aprende las palabras que usarás en esta unidad.</p>
+          </div>
+          <div class="chevron">›</div>
+        </div>
+        ${activityRows}
+      `;
+
+      document.getElementById('unitBtnVocabulario').addEventListener('click', () => showPage('vocabulary', { unitId: unit.id }));
+      document.querySelectorAll('#unitScreenContent .activity-card[data-activity]').forEach(card => {
+        card.addEventListener('click', () => showPage('activity', { unitId: unit.id, activityType: card.dataset.activity }));
+      });
+    }
+
+    return { enter };
+  })();
+  </script>
+
+  <script>
+  // ============================================================
+  // PANTALLA DE VOCABULARIO DE LA UNIDAD (v1.1-alpha)
+  // Cada palabra se puede presionar para escucharla; incluye imagen.
+  // ============================================================
+  const VocabularyScreen = (() => {
+    const els = { content: document.getElementById('vocabularyScreenContent') };
+    let currentAudio = null;
+
+    async function enter(unitId) {
+      els.content.innerHTML = `<div class="loading-screen" style="min-height:160px;"><div class="spinner"></div></div>`;
+      if (!unitId) return;
+      try {
+        const words = await DataService.getVocabulary(unitId);
+        render(words);
+      } catch (err) {
+        console.error(err);
+        els.content.innerHTML = `<div class="empty-screen"><p>No se pudo cargar el vocabulario.</p></div>`;
+      }
+    }
+
+    function render(words) {
+      if (words.length === 0) {
+        els.content.innerHTML = `
+          <div class="empty-screen">
+            <div>${ICONS.folder}</div>
+            <p><strong>Aún no hay vocabulario cargado para esta unidad.</strong></p>
+          </div>`;
+        return;
+      }
+
+      els.content.innerHTML = `
+        <div class="home-hero" style="margin-top:10px;">
+          <h1>Vocabulario</h1>
+          <p>Toca una palabra para escucharla.</p>
+        </div>
+        <div class="vocab-grid">
+          ${words.map(w => `
+            <button class="vocab-card" id="vocab-${w.id}">
+              ${w.image_url ? `<img src="${w.image_url}" alt="${w.word}" />` : ''}
+              <span class="vocab-word">${w.word}</span>
+            </button>
+          `).join('')}
+        </div>
+      `;
+
+      words.forEach(w => {
+        document.getElementById(`vocab-${w.id}`).addEventListener('click', () => {
+          if (!w.audio_url) return;
+          if (currentAudio) currentAudio.pause();
+          currentAudio = new Audio(w.audio_url);
+          currentAudio.play().catch(err => console.error('No se pudo reproducir el audio:', err));
+        });
+      });
+    }
+
+    return { enter };
+  })();
+  </script>
+
+  <script>
+  // ============================================================
+  // INICIO DE SESIÓN DEL PANEL DE ADMINISTRACIÓN (v1.1-alpha)
+  // Correo libre + contraseña única "escucha".
+  // ============================================================
+  const AdminLoginScreen = (() => {
+    let initialized = false;
+    const els = {
+      email: document.getElementById('inputAdminEmail'),
+      password: document.getElementById('inputAdminPassword'),
+      error: document.getElementById('adminLoginError'),
+      submit: document.getElementById('btnAdminLoginSubmit'),
+    };
+
+    function enter() {
+      els.error.style.display = 'none';
+      els.password.value = '';
+      if (initialized) return;
+      initialized = true;
+      els.submit.addEventListener('click', handleSubmit);
+      els.password.addEventListener('keydown', (e) => { if (e.key === 'Enter') handleSubmit(); });
+    }
+
+    function handleSubmit() {
+      const email = els.email.value.trim();
+      const password = els.password.value;
+
+      if (!email) {
+        els.error.textContent = 'Ingresa tu correo electrónico.';
+        els.error.style.display = 'block';
+        return;
+      }
+      if (password !== ADMIN_PASSWORD) {
+        els.error.textContent = 'Contraseña incorrecta.';
+        els.error.style.display = 'block';
+        return;
+      }
+
+      sessionStorage.setItem(ADMIN_SESSION_KEY, '1');
+      sessionStorage.setItem('oye_admin_email_v1', email);
+      showPage('admin');
+    }
+
+    return { enter };
+  })();
+  </script>
+
+  <script>
+  // ============================================================
   // LÓGICA DE LA ACTIVIDAD "¿QUÉ VEO?"
   // ============================================================
   const ActivityScreen = (() => {
     const POINTS_PER_QUESTION = 10;
 
     const state = {
+      unitId: null,
+      activityType: ACTIVITY_TYPES.QUE_VEO,
       currentExercise: null,
       exercises: [],          // lista completa de ejercicios, en orden de registro
       answered: false,
@@ -1785,7 +2382,11 @@ a{ color:inherit; }
     };
 
     // Se llama cada vez que se entra a la pantalla de actividad.
-    async function enter() {
+    // unitId/activityType llegan desde el mapa de unidades (v1.1-alpha).
+    async function enter(unitId = state.unitId, activityType = state.activityType) {
+      state.unitId = unitId || null;
+      state.activityType = activityType || ACTIVITY_TYPES.QUE_VEO;
+
       // Reinicia la sesión de juego cada vez que se abre la actividad.
       state.questionIndex = 0;
       state.score = 0;
@@ -1803,7 +2404,7 @@ a{ color:inherit; }
       // fueron creadas. No se repiten ni se muestran al azar: se recorren
       // una por una hasta completarlas todas.
       try {
-        state.exercises = await DataService.getExercisesInOrder(ACTIVITY_TYPES.QUE_VEO);
+        state.exercises = await DataService.getExercisesInOrder(state.activityType, state.unitId);
         state.totalQuestions = state.exercises.length;
       } catch (err) {
         console.error(err);
@@ -1861,7 +2462,9 @@ a{ color:inherit; }
           <button class="btn btn-secondary" id="goToAdminFromEmpty" style="margin-top:10px;">Ir al panel</button>
         </div>
       `;
-      document.getElementById('goToAdminFromEmpty').addEventListener('click', () => showPage('admin'));
+      document.getElementById('goToAdminFromEmpty').addEventListener('click', () => {
+        showPage(sessionStorage.getItem(ADMIN_SESSION_KEY) === '1' ? 'admin' : 'admin-login');
+      });
     }
 
     function renderError() {
@@ -1877,35 +2480,48 @@ a{ color:inherit; }
 
     function renderExercise(exercise) {
       const audios = exercise.exercise_audios;
+      const meta = ACTIVITY_META[state.activityType] || ACTIVITY_META[ACTIVITY_TYPES.QUE_VEO];
+      const isTextMode = (exercise.option_mode || meta.optionMode) === 'text';
+
+      const promptHtml = exercise.image_url
+        ? `<div class="image-card"><img src="${exercise.image_url}" alt="Imagen del ejercicio" /></div>`
+        : `<button class="prompt-audio-card" id="btnPlayPrompt">${ICONS.eye} Toca para escuchar</button>`;
+
+      const instructions = isTextMode
+        ? 'Escucha el audio y luego toca la alternativa correcta.'
+        : 'Toca una alternativa para escucharla y luego confirma tu respuesta.';
 
       els.content.innerHTML = `
         <div class="activity-header">
           <div class="dot-icon">${ICONS.eye}</div>
-          <h1>¿Qué veo?</h1>
+          <h1>${meta.label}</h1>
         </div>
-        <p class="activity-instructions">Toca una alternativa para escucharla y luego confirma tu respuesta.</p>
+        <p class="activity-instructions">${instructions}</p>
 
-        <div class="image-card">
-          <img src="${exercise.image_url}" alt="Imagen del ejercicio" />
-        </div>
+        ${promptHtml}
 
         <div class="feedback-banner" id="feedbackBanner"></div>
         <div class="feedback-caption" id="feedbackCaption"></div>
 
         <div class="options-list" id="optionsList">
-          ${audios.map((a, i) => renderOptionButton(a, i)).join('')}
+          ${audios.map((a, i) => isTextMode ? renderTextOptionButton(a, i) : renderOptionButton(a, i)).join('')}
           <button class="btn confirm-select-btn" id="btnConfirmSelect" disabled>Seleccionar</button>
         </div>
       `;
 
+      if (exercise.prompt_audio_url) {
+        const promptBtn = document.getElementById('btnPlayPrompt');
+        if (promptBtn) promptBtn.addEventListener('click', () => playAudio(exercise.prompt_audio_url, promptBtn));
+      }
+
       audios.forEach((a, i) => {
         const btn = document.getElementById(`opt-${i}`);
-        btn.addEventListener('click', () => handleTapOption(i, exercise));
+        btn.addEventListener('click', () => handleTapOption(i, exercise, isTextMode));
       });
 
       document.getElementById('btnConfirmSelect').addEventListener('click', () => {
         if (state.selectedIndex === null) return;
-        confirmSelection(exercise);
+        confirmSelection(exercise, isTextMode);
       });
     }
 
@@ -1926,20 +2542,35 @@ a{ color:inherit; }
       `;
     }
 
-    function handleTapOption(index, exercise) {
+    // Alternativa de texto — usada en "¿Cuál está bien?" y "¿Qué dice?".
+    // Si además tiene audio propio, se reproduce al tocarla.
+    function renderTextOptionButton(option, index) {
+      const letter = String.fromCharCode(65 + index);
+      return `
+        <button class="text-option" id="opt-${index}">
+          <span class="opt-label">${letter}.</span>
+          <span>${option.label || ''}</span>
+        </button>
+      `;
+    }
+
+    function handleTapOption(index, exercise, isTextMode) {
       if (state.answered) return;
 
       const btn = document.getElementById(`opt-${index}`);
-      playAudio(exercise.exercise_audios[index].audio_url, btn);
+      const optionData = exercise.exercise_audios[index];
+      if (optionData.audio_url) {
+        playAudio(optionData.audio_url, btn);
+      }
 
       state.selectedIndex = index;
-      document.querySelectorAll('.audio-option').forEach(b => b.classList.remove('selected'));
+      document.querySelectorAll(isTextMode ? '.text-option' : '.audio-option').forEach(b => b.classList.remove('selected'));
       btn.classList.add('selected');
 
       document.getElementById('btnConfirmSelect').disabled = false;
     }
 
-    function confirmSelection(exercise) {
+    function confirmSelection(exercise, isTextMode) {
       if (state.answered || state.selectedIndex === null) return;
       state.answered = true;
 
@@ -1949,7 +2580,7 @@ a{ color:inherit; }
       const isCorrect = !!audioData.is_correct;
 
       document.getElementById('btnConfirmSelect').style.display = 'none';
-      resolveAnswer(isCorrect, btn, exercise);
+      resolveAnswer(isCorrect, btn, exercise, isTextMode);
     }
 
     function playAudio(url, btnEl) {
@@ -1998,13 +2629,13 @@ a{ color:inherit; }
       notice.textContent = message;
     }
 
-    function resolveAnswer(isCorrect, selectedBtn, exercise) {
+    function resolveAnswer(isCorrect, selectedBtn, exercise, isTextMode) {
       state.totalCount++;
       if (isCorrect) state.correctCount++;
 
       updateProgress(((state.questionIndex + 1) / state.totalQuestions) * 100);
 
-      document.querySelectorAll('.audio-option').forEach(btn => {
+      document.querySelectorAll(isTextMode ? '.text-option' : '.audio-option').forEach(btn => {
         if (btn !== selectedBtn) {
           btn.style.display = 'none';
         } else {
@@ -2208,26 +2839,54 @@ a{ color:inherit; }
   const AdminScreen = (() => {
     let audioRowCount = 0;
     let initialized = false;
+    let unitsCache = [];
 
     const els = {
       tabs: document.querySelectorAll('.admin-tab'),
+      tabUnits: document.getElementById('tab-units'),
+      tabVocab: document.getElementById('tab-vocab'),
       tabCreate: document.getElementById('tab-create'),
       tabList: document.getElementById('tab-list'),
       countBadge: document.getElementById('countBadge'),
 
+      // Unidades
+      inputUnitName: document.getElementById('inputUnitName'),
+      inputUnitDescription: document.getElementById('inputUnitDescription'),
+      inputUnitVideo: document.getElementById('inputUnitVideo'),
+      btnSaveUnit: document.getElementById('btnSaveUnit'),
+      unitList: document.getElementById('unitList'),
+
+      // Vocabulario
+      selectVocabUnit: document.getElementById('selectVocabUnit'),
+      inputVocabWord: document.getElementById('inputVocabWord'),
+      inputVocabImage: document.getElementById('inputVocabImage'),
+      inputVocabAudio: document.getElementById('inputVocabAudio'),
+      btnSaveVocabWord: document.getElementById('btnSaveVocabWord'),
+      vocabList: document.getElementById('vocabList'),
+
+      // Ejercicios
+      selectExerciseUnit: document.getElementById('selectExerciseUnit'),
+      selectActivityType: document.getElementById('selectActivityType'),
+      groupImage: document.getElementById('groupImage'),
+      groupPromptAudio: document.getElementById('groupPromptAudio'),
+      labelAlternatives: document.getElementById('labelAlternatives'),
       inputTitle: document.getElementById('inputTitle'),
       inputImage: document.getElementById('inputImage'),
+      inputPromptAudio: document.getElementById('inputPromptAudio'),
       audioInputsContainer: document.getElementById('audioInputsContainer'),
       btnAddAudio: document.getElementById('btnAddAudio'),
       btnSaveExercise: document.getElementById('btnSaveExercise'),
       exerciseList: document.getElementById('exerciseList'),
+      selectListUnit: document.getElementById('selectListUnit'),
       toast: document.getElementById('toast'),
     };
 
-    function enter() {
+    async function enter() {
       if (initialized) return;
       initialized = true;
       setup();
+      await refreshUnitsCache();
+      loadUnitList();
       refreshCountBadge();
     }
 
@@ -2237,9 +2896,14 @@ a{ color:inherit; }
           els.tabs.forEach(t => t.classList.remove('active'));
           tab.classList.add('active');
           const target = tab.dataset.tab;
+          els.tabUnits.style.display = target === 'units' ? 'block' : 'none';
+          els.tabVocab.style.display = target === 'vocab' ? 'block' : 'none';
           els.tabCreate.style.display = target === 'create' ? 'block' : 'none';
           els.tabList.style.display = target === 'list' ? 'block' : 'none';
-          if (target === 'list') loadExerciseList();
+          if (target === 'units') loadUnitList();
+          if (target === 'vocab') { refreshUnitsCache().then(loadVocabList); }
+          if (target === 'create') refreshUnitsCache();
+          if (target === 'list') { refreshUnitsCache().then(loadExerciseList); }
         });
       });
 
@@ -2247,19 +2911,216 @@ a{ color:inherit; }
       addAudioRow(true);
       addAudioRow(false);
 
+      els.btnSaveUnit.addEventListener('click', handleSaveUnit);
+      els.btnSaveVocabWord.addEventListener('click', handleSaveVocabWord);
       els.btnSaveExercise.addEventListener('click', handleSave);
+
+      els.selectVocabUnit.addEventListener('change', loadVocabList);
+      els.selectListUnit.addEventListener('change', loadExerciseList);
+      els.selectActivityType.addEventListener('change', updateFormForActivityType);
+      updateFormForActivityType();
     }
 
+    // --------------------------------------------------------
+    // Muestra/oculta campos según la actividad seleccionada:
+    // "¿Qué veo?" usa imagen + alternativas de audio;
+    // "¿Cuál está bien?" y "¿Qué dice?" usan audio de la pregunta
+    // + alternativas de texto.
+    // --------------------------------------------------------
+    function updateFormForActivityType() {
+      const type = els.selectActivityType.value;
+      const meta = ACTIVITY_META[type] || ACTIVITY_META[ACTIVITY_TYPES.QUE_VEO];
+      const isTextMode = meta.optionMode === 'text';
+      els.groupImage.style.display = isTextMode ? 'none' : 'block';
+      els.groupPromptAudio.style.display = isTextMode ? 'block' : 'none';
+      els.labelAlternatives.textContent = isTextMode ? 'Alternativas de texto' : 'Alternativas de audio';
+      document.querySelectorAll('.audio-input-row [data-role=file]').forEach(input => {
+        input.style.display = isTextMode ? 'none' : 'block';
+      });
+    }
+
+    // --------------------------------------------------------
+    // UNIDADES
+    // --------------------------------------------------------
+    async function refreshUnitsCache() {
+      try {
+        unitsCache = await DataService.getUnits();
+        fillUnitSelect(els.selectVocabUnit, unitsCache);
+        fillUnitSelect(els.selectExerciseUnit, unitsCache);
+        fillUnitSelect(els.selectListUnit, unitsCache, true);
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    function fillUnitSelect(selectEl, units, withAllOption = false) {
+      const prevValue = selectEl.value;
+      selectEl.innerHTML = (withAllOption ? '<option value="">Todas las unidades</option>' : '')
+        + units.map(u => `<option value="${u.id}">${u.name}</option>`).join('');
+      if (prevValue && [...selectEl.options].some(o => o.value === prevValue)) {
+        selectEl.value = prevValue;
+      }
+    }
+
+    async function handleSaveUnit() {
+      const name = els.inputUnitName.value.trim();
+      const description = els.inputUnitDescription.value.trim();
+      const videoFile = els.inputUnitVideo.files[0];
+
+      if (!name) return showToast('Ingresa el nombre de la unidad.', 'error');
+
+      els.btnSaveUnit.disabled = true;
+      els.btnSaveUnit.textContent = 'Guardando…';
+      try {
+        let videoUrl = null;
+        if (videoFile) videoUrl = await DataService.uploadFile(BUCKETS.VIDEOS, videoFile);
+
+        await DataService.createUnit({ name, description, videoUrl, position: unitsCache.length });
+
+        showToast('Unidad guardada correctamente.', 'success');
+        els.inputUnitName.value = '';
+        els.inputUnitDescription.value = '';
+        els.inputUnitVideo.value = '';
+        await refreshUnitsCache();
+        loadUnitList();
+      } catch (err) {
+        console.error(err);
+        showToast('Ocurrió un error al guardar la unidad.', 'error');
+      } finally {
+        els.btnSaveUnit.disabled = false;
+        els.btnSaveUnit.textContent = 'Guardar unidad';
+      }
+    }
+
+    function loadUnitList() {
+      if (unitsCache.length === 0) {
+        els.unitList.innerHTML = `<div class="empty-screen" style="min-height:120px;"><p>Todavía no hay unidades creadas.</p></div>`;
+        return;
+      }
+      els.unitList.innerHTML = unitsCache.map(u => `
+        <div class="exercise-row">
+          <div class="info">
+            <h4>${u.name}</h4>
+            <p>${u.description || 'Sin descripción'}${u.video_url ? ' · con video' : ''}</p>
+          </div>
+          <div class="actions">
+            <button class="icon-btn small danger" id="del-unit-${u.id}" title="Eliminar">${ICONS.trash}</button>
+          </div>
+        </div>
+      `).join('');
+      unitsCache.forEach(u => {
+        document.getElementById(`del-unit-${u.id}`).addEventListener('click', () => handleDeleteUnit(u.id));
+      });
+    }
+
+    async function handleDeleteUnit(id) {
+      if (!confirm('¿Eliminar esta unidad? Se eliminará también su vocabulario y ejercicios asociados.')) return;
+      try {
+        await DataService.deleteUnit(id);
+        showToast('Unidad eliminada.', 'success');
+        await refreshUnitsCache();
+        loadUnitList();
+      } catch (err) {
+        console.error(err);
+        showToast('No se pudo eliminar la unidad.', 'error');
+      }
+    }
+
+    // --------------------------------------------------------
+    // VOCABULARIO
+    // --------------------------------------------------------
+    async function handleSaveVocabWord() {
+      const unitId = els.selectVocabUnit.value;
+      const word = els.inputVocabWord.value.trim();
+      const imageFile = els.inputVocabImage.files[0];
+      const audioFile = els.inputVocabAudio.files[0];
+
+      if (!unitId) return showToast('Crea o selecciona una unidad primero.', 'error');
+      if (!word) return showToast('Ingresa la palabra.', 'error');
+
+      els.btnSaveVocabWord.disabled = true;
+      els.btnSaveVocabWord.textContent = 'Guardando…';
+      try {
+        let imageUrl = null, audioUrl = null;
+        if (imageFile) imageUrl = await DataService.uploadFile(BUCKETS.IMAGES, imageFile);
+        if (audioFile) audioUrl = await DataService.uploadFile(BUCKETS.AUDIOS, audioFile);
+
+        await DataService.createVocabWord({ unitId, word, imageUrl, audioUrl });
+
+        showToast('Palabra guardada correctamente.', 'success');
+        els.inputVocabWord.value = '';
+        els.inputVocabImage.value = '';
+        els.inputVocabAudio.value = '';
+        loadVocabList();
+      } catch (err) {
+        console.error(err);
+        showToast('Ocurrió un error al guardar la palabra.', 'error');
+      } finally {
+        els.btnSaveVocabWord.disabled = false;
+        els.btnSaveVocabWord.textContent = 'Guardar palabra';
+      }
+    }
+
+    async function loadVocabList() {
+      const unitId = els.selectVocabUnit.value;
+      if (!unitId) {
+        els.vocabList.innerHTML = `<div class="empty-screen" style="min-height:120px;"><p>Crea una unidad primero.</p></div>`;
+        return;
+      }
+      els.vocabList.innerHTML = `<div class="loading-screen" style="min-height:120px;"><div class="spinner"></div></div>`;
+      try {
+        const words = await DataService.getVocabulary(unitId);
+        if (words.length === 0) {
+          els.vocabList.innerHTML = `<div class="empty-screen" style="min-height:120px;"><p>Sin palabras todavía en esta unidad.</p></div>`;
+          return;
+        }
+        els.vocabList.innerHTML = words.map(w => `
+          <div class="exercise-row">
+            ${w.image_url ? `<img src="${w.image_url}" alt="" />` : ''}
+            <div class="info">
+              <h4>${w.word}</h4>
+              <p>${w.audio_url ? 'Con audio' : 'Sin audio'}</p>
+            </div>
+            <div class="actions">
+              <button class="icon-btn small danger" id="del-vocab-${w.id}" title="Eliminar">${ICONS.trash}</button>
+            </div>
+          </div>
+        `).join('');
+        words.forEach(w => {
+          document.getElementById(`del-vocab-${w.id}`).addEventListener('click', () => handleDeleteVocabWord(w.id));
+        });
+      } catch (err) {
+        console.error(err);
+        els.vocabList.innerHTML = `<div class="empty-screen"><p>Error al cargar el vocabulario.</p></div>`;
+      }
+    }
+
+    async function handleDeleteVocabWord(id) {
+      if (!confirm('¿Eliminar esta palabra?')) return;
+      try {
+        await DataService.deleteVocabWord(id);
+        showToast('Palabra eliminada.', 'success');
+        loadVocabList();
+      } catch (err) {
+        console.error(err);
+        showToast('No se pudo eliminar la palabra.', 'error');
+      }
+    }
+
+    // --------------------------------------------------------
+    // EJERCICIOS
+    // --------------------------------------------------------
     function addAudioRow(isCorrectDefault = false) {
       audioRowCount++;
       const id = audioRowCount;
+      const isTextMode = (ACTIVITY_META[els.selectActivityType.value] || {}).optionMode === 'text';
       const row = document.createElement('div');
       row.className = 'audio-input-row';
       row.dataset.rowId = id;
       row.innerHTML = `
         <div class="file-field">
-          <input type="text" placeholder="Etiqueta interna (ej: Fuente con peras)" data-role="label" />
-          <input type="file" accept="audio/*" data-role="file" />
+          <input type="text" placeholder="${isTextMode ? 'Texto de la alternativa (ej: manzana)' : 'Etiqueta interna (ej: Fuente con peras)'}" data-role="label" />
+          <input type="file" accept="audio/*" data-role="file" style="${isTextMode ? 'display:none;' : ''}" />
         </div>
         <label class="correct-toggle ${isCorrectDefault ? 'is-correct' : ''}">
           <input type="radio" name="correctAudio" data-role="correct" ${isCorrectDefault ? 'checked' : ''} />
@@ -2281,39 +3142,55 @@ a{ color:inherit; }
     }
 
     async function handleSave() {
+      const unitId = els.selectExerciseUnit.value;
+      const activityType = els.selectActivityType.value;
+      const meta = ACTIVITY_META[activityType] || ACTIVITY_META[ACTIVITY_TYPES.QUE_VEO];
+      const isTextMode = meta.optionMode === 'text';
+
       const title = els.inputTitle.value.trim();
       const imageFile = els.inputImage.files[0];
+      const promptAudioFile = els.inputPromptAudio.files[0];
       const rows = Array.from(document.querySelectorAll('.audio-input-row'));
 
-      if (!imageFile) return showToast('Selecciona una imagen para el ejercicio.', 'error');
-      if (rows.length < 2) return showToast('Agrega al menos dos alternativas de audio.', 'error');
+      if (!unitId) return showToast('Crea o selecciona una unidad primero.', 'error');
+      if (!isTextMode && !imageFile) return showToast('Selecciona una imagen para el ejercicio.', 'error');
+      if (isTextMode && !promptAudioFile) return showToast('Sube el audio de la pregunta.', 'error');
+      if (rows.length < 2) return showToast('Agrega al menos dos alternativas.', 'error');
 
-      const audiosToUpload = rows.map(row => ({
-        file: row.querySelector('[data-role=file]').files[0],
+      const optionsToUpload = rows.map(row => ({
+        file: isTextMode ? null : row.querySelector('[data-role=file]').files[0],
         label: row.querySelector('[data-role=label]').value.trim(),
         isCorrect: row.querySelector('[data-role=correct]').checked,
       }));
 
-      if (audiosToUpload.some(a => !a.file)) {
+      if (!isTextMode && optionsToUpload.some(a => !a.file)) {
         return showToast('Falta el archivo de audio en alguna alternativa.', 'error');
       }
-      if (!audiosToUpload.some(a => a.isCorrect)) {
+      if (isTextMode && optionsToUpload.some(a => !a.label)) {
+        return showToast('Falta el texto en alguna alternativa.', 'error');
+      }
+      if (!optionsToUpload.some(a => a.isCorrect)) {
         return showToast('Marca cuál alternativa es la correcta.', 'error');
       }
 
       setSaving(true);
       try {
-        const imageUrl = await DataService.uploadFile(BUCKETS.IMAGES, imageFile);
+        let imageUrl = null, promptAudioUrl = null;
+        if (!isTextMode) imageUrl = await DataService.uploadFile(BUCKETS.IMAGES, imageFile);
+        if (isTextMode) promptAudioUrl = await DataService.uploadFile(BUCKETS.AUDIOS, promptAudioFile);
 
         const audios = [];
-        for (const a of audiosToUpload) {
-          const url = await DataService.uploadFile(BUCKETS.AUDIOS, a.file);
+        for (const a of optionsToUpload) {
+          const url = a.file ? await DataService.uploadFile(BUCKETS.AUDIOS, a.file) : null;
           audios.push({ url, label: a.label, isCorrect: a.isCorrect });
         }
 
         await DataService.createExercise({
-          activityType: ACTIVITY_TYPES.QUE_VEO,
+          unitId,
+          activityType,
+          optionMode: meta.optionMode,
           imageUrl,
+          promptAudioUrl,
           title,
           audios,
         });
@@ -2332,6 +3209,7 @@ a{ color:inherit; }
     function resetForm() {
       els.inputTitle.value = '';
       els.inputImage.value = '';
+      els.inputPromptAudio.value = '';
       els.audioInputsContainer.innerHTML = '';
       addAudioRow(true);
       addAudioRow(false);
@@ -2343,9 +3221,15 @@ a{ color:inherit; }
     }
 
     async function loadExerciseList() {
+      const unitId = els.selectListUnit.value || null;
       els.exerciseList.innerHTML = `<div class="loading-screen" style="min-height:120px;"><div class="spinner"></div></div>`;
       try {
-        const exercises = await DataService.getExercises(ACTIVITY_TYPES.QUE_VEO);
+        // Junta los ejercicios de las 3 actividades para la unidad elegida
+        // (o de todas las unidades si no se filtra).
+        const types = Object.values(ACTIVITY_TYPES);
+        const lists = await Promise.all(types.map(t => DataService.getExercises(t, unitId)));
+        const exercises = lists.flat().sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+
         els.countBadge.textContent = exercises.length;
 
         if (exercises.length === 0) {
@@ -2366,13 +3250,15 @@ a{ color:inherit; }
     }
 
     function renderExerciseRow(ex) {
-      const correctAudio = (ex.exercise_audios || []).find(a => a.is_correct);
+      const correctOption = (ex.exercise_audios || []).find(a => a.is_correct);
+      const meta = ACTIVITY_META[ex.activity_type] || {};
+      const unit = unitsCache.find(u => u.id === ex.unit_id);
       return `
         <div class="exercise-row">
-          <img src="${ex.image_url}" alt="" />
+          ${ex.image_url ? `<img src="${ex.image_url}" alt="" />` : ''}
           <div class="info">
-            <h4>${ex.title || '(sin nombre)'}</h4>
-            <p>${ex.exercise_audios.length} alternativas · correcta: ${correctAudio ? (correctAudio.label || 'sin etiqueta') : '—'}</p>
+            <h4>${ex.title || '(sin nombre)'} <span style="font-weight:400;color:var(--color-text-muted);">— ${meta.label || ex.activity_type}</span></h4>
+            <p>${unit ? unit.name + ' · ' : ''}${ex.exercise_audios.length} alternativas · correcta: ${correctOption ? (correctOption.label || 'sin etiqueta') : '—'}</p>
           </div>
           <div class="actions">
             <button class="icon-btn small" id="edit-${ex.id}" title="Editar nombre">${ICONS.edit}</button>
@@ -2383,7 +3269,7 @@ a{ color:inherit; }
     }
 
     async function handleDelete(id) {
-      if (!confirm('¿Eliminar este ejercicio y sus audios? Esta acción no se puede deshacer.')) return;
+      if (!confirm('¿Eliminar este ejercicio y sus alternativas? Esta acción no se puede deshacer.')) return;
       try {
         await DataService.deleteExercise(id);
         showToast('Ejercicio eliminado.', 'success');
@@ -2415,8 +3301,9 @@ a{ color:inherit; }
 
     async function refreshCountBadge() {
       try {
-        const list = await DataService.getExercises(ACTIVITY_TYPES.QUE_VEO);
-        els.countBadge.textContent = list.length;
+        const types = Object.values(ACTIVITY_TYPES);
+        const lists = await Promise.all(types.map(t => DataService.getExercises(t)));
+        els.countBadge.textContent = lists.flat().length;
       } catch (e) { /* silencioso: solo afecta el contador */ }
     }
 
@@ -2463,6 +3350,14 @@ a{ color:inherit; }
       gate.classList.remove('show');
     });
   })();
+  </script>
+
+  <script>
+  // ============================================================
+  // ARRANQUE INICIAL — renderiza el mapa de unidades al cargar
+  // la app (v1.1-alpha)
+  // ============================================================
+  HomeScreen.enter();
   </script>
 
 </body>
