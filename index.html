@@ -717,31 +717,61 @@ a{ color:inherit; }
   gap:12px;
 }
 .vocab-card{
+  position:relative;
   display:flex;
   flex-direction:column;
   align-items:center;
   gap:8px;
   background: var(--color-bg);
-  border: 1px solid var(--color-border);
+  border: 2px solid var(--color-border);
   border-radius: var(--radius-lg);
   padding:12px;
   box-shadow: var(--shadow-soft);
   cursor:pointer;
   font-family: inherit;
+  transition: transform .12s ease, border-color .12s ease;
 }
 .vocab-card:active{ transform: scale(0.97); }
+.vocab-card.is-playing{
+  border-color: var(--color-primary);
+  animation: vocabPulse 0.5s ease-in-out infinite alternate;
+}
+@keyframes vocabPulse{
+  from{ transform: scale(1); }
+  to{ transform: scale(1.03); }
+}
 .vocab-card img{
   width:100%;
   aspect-ratio: 1 / 1;
   object-fit:cover;
   border-radius: var(--radius-md);
+  background: var(--color-primary-light);
 }
+.vocab-card-image-placeholder{
+  width:100%;
+  aspect-ratio: 1 / 1;
+  border-radius: var(--radius-md);
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+  display:flex; align-items:center; justify-content:center;
+}
+.vocab-card-image-placeholder svg{ width:32px; height:32px; }
 .vocab-word{
+  display:flex;
+  align-items:center;
+  gap:6px;
   font-family: var(--font-display);
   font-size:14px;
   color: var(--color-text);
   text-transform:capitalize;
 }
+.vocab-word .speaker-icon{
+  display:flex;
+  color: var(--color-primary);
+  flex-shrink:0;
+}
+.vocab-word .speaker-icon svg{ width:15px; height:15px; }
+.vocab-card:not(.has-audio) .speaker-icon{ opacity: 0.3; }
 
 /* Opciones de texto (usadas en "¿Cuál está bien?" y "¿Qué dice?") */
 .text-option{
@@ -1688,6 +1718,8 @@ a{ color:inherit; }
     trophy: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 4h8v5a4 4 0 0 1-8 0V4z"/><path d="M8 5H4v2a4 4 0 0 0 4 4"/><path d="M16 5h4v2a4 4 0 0 1-4 4"/><path d="M12 13v3"/><path d="M9 20h6"/><path d="M10 16h4l1 4H9l1-4z"/></svg>',
     edit: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>',
     trash: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/></svg>',
+    volume: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H2v6h4l5 4V5z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.5 5.5a9 9 0 0 1 0 13"/></svg>',
+    image: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg>',
   };
   // Envuelve un ícono con un tamaño específico (ancho/alto en px)
   function iconSized(name, size) {
@@ -2273,24 +2305,35 @@ a{ color:inherit; }
       els.content.innerHTML = `
         <div class="home-hero" style="margin-top:10px;">
           <h1>Vocabulario</h1>
-          <p>Toca una palabra para escucharla.</p>
+          <p>Toca una palabra para ver su imagen y escucharla.</p>
         </div>
         <div class="vocab-grid">
           ${words.map(w => `
-            <button class="vocab-card" id="vocab-${w.id}">
-              ${w.image_url ? `<img src="${w.image_url}" alt="${w.word}" />` : ''}
-              <span class="vocab-word">${w.word}</span>
+            <button class="vocab-card ${w.audio_url ? 'has-audio' : ''}" id="vocab-${w.id}">
+              ${w.image_url
+                ? `<img src="${w.image_url}" alt="${w.word}" />`
+                : `<div class="vocab-card-image-placeholder">${ICONS.image}</div>`}
+              <span class="vocab-word"><span class="speaker-icon">${ICONS.volume}</span>${w.word}</span>
             </button>
           `).join('')}
         </div>
       `;
 
       words.forEach(w => {
-        document.getElementById(`vocab-${w.id}`).addEventListener('click', () => {
+        const card = document.getElementById(`vocab-${w.id}`);
+        card.addEventListener('click', () => {
           if (!w.audio_url) return;
-          if (currentAudio) currentAudio.pause();
+          if (currentAudio) {
+            currentAudio.pause();
+            document.querySelectorAll('.vocab-card.is-playing').forEach(c => c.classList.remove('is-playing'));
+          }
           currentAudio = new Audio(w.audio_url);
-          currentAudio.play().catch(err => console.error('No se pudo reproducir el audio:', err));
+          card.classList.add('is-playing');
+          currentAudio.addEventListener('ended', () => card.classList.remove('is-playing'));
+          currentAudio.play().catch(err => {
+            console.error('No se pudo reproducir el audio:', err);
+            card.classList.remove('is-playing');
+          });
         });
       });
     }
