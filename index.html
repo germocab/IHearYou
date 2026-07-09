@@ -2239,6 +2239,16 @@ a{ color:inherit; }
       const password = loginEls.password.value;
       if (!email || !password) return showError(loginEls.error, 'Ingresa tu correo y contraseña.');
 
+      // Acceso de desarrolladores: correo + contraseña especial "escucha".
+      // No requiere haber creado una cuenta — entra directo al panel de
+      // administración. (v1.2-alpha)
+      if (password === ADMIN_PASSWORD) {
+        sessionStorage.setItem(ADMIN_SESSION_KEY, '1');
+        sessionStorage.setItem('oye_admin_email_v1', email);
+        showPage('admin');
+        return;
+      }
+
       loginEls.submit.disabled = true;
       loginEls.submit.textContent = 'Ingresando…';
       try {
