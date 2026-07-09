@@ -811,6 +811,48 @@ a{ color:inherit; }
   text-align:center;
   padding-top: 24px;
 }
+
+/* ==========================================================
+   ONBOARDING (v1.2-alpha)
+========================================================== */
+.onboarding-dots{
+  flex:1;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:6px;
+}
+.onboarding-dot{
+  width:8px; height:8px;
+  border-radius:50%;
+  background: var(--color-border);
+}
+.onboarding-dot.active{ background: var(--color-primary); width:20px; border-radius: var(--radius-pill); }
+.onboarding-dot.done{ background: var(--color-primary-light); }
+
+.onboarding-input{
+  width:100%;
+  border:2px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding:14px 16px;
+  font-family: var(--font-display);
+  font-size:16px;
+  color: var(--color-text);
+  background: var(--color-bg);
+}
+.onboarding-input:focus{ outline:none; border-color: var(--color-primary); }
+
+.avatar-option{
+  width:56px; height:56px;
+  border-radius:50%;
+  border: 3px solid transparent;
+  cursor:pointer;
+  box-shadow: var(--shadow-soft);
+}
+.avatar-option.selected{
+  border-color: var(--color-text);
+  transform: scale(1.08);
+}
 .home-footer-link a{
   font-size:12.5px;
   color: var(--color-text-muted);
@@ -1356,25 +1398,100 @@ a{ color:inherit; }
 <body>
 
   <!-- ============================================================
-       MODAL DE BIENVENIDA — pregunta el nombre al entrar a la app
+       PÁGINA: BIENVENIDA (elegir Iniciar sesión / Crear cuenta)
+       v1.2-alpha
   ============================================================ -->
-  <div class="name-gate" id="nameGate">
-    <div class="name-gate-card">
-      <div class="name-gate-icon">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.5-7 8-7s8 3 8 7"/></svg>
+  <div class="page" id="page-auth-start">
+    <div class="app-shell">
+      <div class="page-scroll">
+        <div class="home-screen" style="justify-content:center; align-items:center; text-align:center; min-height:80vh;">
+          <div class="name-gate-icon" style="margin-bottom:6px;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg>
+          </div>
+          <h1 style="font-family:var(--font-display); font-size:24px; margin:0 0 6px;">Oye</h1>
+          <p style="color:var(--color-text-muted); max-width:280px; margin:0 auto 28px;">Entrena tu oído y tu comunicación con actividades pensadas para ti.</p>
+          <div style="width:100%; max-width:300px; display:flex; flex-direction:column; gap:12px;">
+            <button class="btn btn-primary" id="btnGoLogin">Iniciar sesión</button>
+            <button class="btn btn-secondary" id="btnGoSignup">Crear cuenta</button>
+          </div>
+        </div>
       </div>
-      <h2>¡Bienvenido/a!</h2>
-      <p>¿Cómo te llamas? Usaremos tu nombre para personalizar tu perfil y tus medallas.</p>
-      <input type="text" id="inputNameGate" placeholder="Escribe tu nombre" maxlength="40" autocomplete="off" />
-      <button class="btn btn-primary" id="btnNameGateContinue">Continuar</button>
-      <button class="name-gate-skip" id="btnNameGateSkip">Omitir por ahora</button>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       PÁGINA: INICIAR SESIÓN — v1.2-alpha
+  ============================================================ -->
+  <div class="page" id="page-auth-login">
+    <div class="app-shell">
+      <div class="topbar">
+        <button class="icon-btn" id="btnBackFromLogin" aria-label="Volver"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px;"><path d="M18 6 6 18"/><path d="M6 6l12 12"/></svg></button>
+        <div style="flex:1;"></div>
+      </div>
+      <div class="page-scroll">
+        <div class="home-screen">
+          <div class="name-gate-card" style="margin:24px auto; max-width:340px;">
+            <h2>Iniciar sesión</h2>
+            <p>Ingresa tu correo y contraseña para continuar.</p>
+            <input type="email" id="inputLoginEmail" placeholder="Correo electrónico" autocomplete="username" />
+            <input type="password" id="inputLoginPassword" placeholder="Contraseña" autocomplete="current-password" style="margin-top:10px;" />
+            <div class="hint" id="loginError" style="color:var(--color-error); display:none; margin-top:6px;"></div>
+            <button class="btn btn-primary" id="btnLoginSubmit" style="margin-top:14px;">Iniciar sesión</button>
+            <button class="name-gate-skip" id="btnGoSignupFromLogin" style="margin-top:12px;">¿No tienes cuenta? Crea una</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       PÁGINA: CREAR CUENTA — v1.2-alpha
+  ============================================================ -->
+  <div class="page" id="page-auth-signup">
+    <div class="app-shell">
+      <div class="topbar">
+        <button class="icon-btn" id="btnBackFromSignup" aria-label="Volver"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px;"><path d="M18 6 6 18"/><path d="M6 6l12 12"/></svg></button>
+        <div style="flex:1;"></div>
+      </div>
+      <div class="page-scroll">
+        <div class="home-screen">
+          <div class="name-gate-card" style="margin:24px auto; max-width:340px;">
+            <h2>Crear cuenta</h2>
+            <p>Crea tu cuenta con tu correo electrónico.</p>
+            <input type="email" id="inputSignupEmail" placeholder="Correo electrónico" autocomplete="username" />
+            <input type="password" id="inputSignupPassword" placeholder="Contraseña" autocomplete="new-password" style="margin-top:10px;" />
+            <input type="password" id="inputSignupPasswordConfirm" placeholder="Confirma tu contraseña" autocomplete="new-password" style="margin-top:10px;" />
+            <div class="hint" id="signupError" style="color:var(--color-error); display:none; margin-top:6px;"></div>
+            <button class="btn btn-primary" id="btnSignupSubmit" style="margin-top:14px;">Crear cuenta</button>
+            <button class="name-gate-skip" id="btnGoLoginFromSignup" style="margin-top:12px;">¿Ya tienes cuenta? Inicia sesión</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       PÁGINA: ONBOARDING (preguntas iniciales) — v1.2-alpha
+       La sección de diagnóstico (actividades de evaluación) se
+       omite por ahora; se agregará cuando existan esas actividades.
+  ============================================================ -->
+  <div class="page" id="page-onboarding">
+    <div class="app-shell">
+      <div class="topbar">
+        <button class="icon-btn" id="btnOnboardingBack" aria-label="Atrás"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px;"><path d="m15 18-6-6 6-6"/></svg></button>
+        <div class="onboarding-dots" id="onboardingDots"></div>
+        <div style="width:34px;"></div>
+      </div>
+      <div class="page-scroll">
+        <div class="home-screen" id="onboardingContent"></div>
+      </div>
     </div>
   </div>
 
   <!-- ============================================================
        PÁGINA 1: INICIO
   ============================================================ -->
-  <div class="page active" id="page-home">
+  <div class="page" id="page-home">
     <div class="app-shell">
       <div class="page-scroll">
         <div class="home-screen">
@@ -1661,6 +1778,7 @@ a{ color:inherit; }
     AUDIOS: 'exercise_audios',
     UNITS: 'units',
     VOCAB: 'unit_vocabulary',
+    PROFILES: 'profiles',
   };
 
   const BUCKETS = {
@@ -1686,7 +1804,7 @@ a{ color:inherit; }
   // ============================================================
   // VERSIÓN DE LA APP
   // ============================================================
-  const APP_VERSION = '1.1-alpha';
+  const APP_VERSION = '1.2-alpha';
 
   // Contraseña única del panel de administración (v1.1-alpha).
   // El correo se pide solo como identificación; no se valida contra
@@ -1863,6 +1981,38 @@ a{ color:inherit; }
       if (error) throw error;
     },
 
+    // --------------------------------------------------------
+    // PERFIL DE USUARIO / ONBOARDING — v1.2-alpha
+    // --------------------------------------------------------
+    async getOrCreateProfile(user) {
+      const { data, error } = await supabaseClient
+        .from(TABLES.PROFILES)
+        .select('*')
+        .eq('id', user.id)
+        .maybeSingle();
+      if (error) throw error;
+      if (data) return data;
+
+      const { data: created, error: insErr } = await supabaseClient
+        .from(TABLES.PROFILES)
+        .insert({ id: user.id, email: user.email, onboarding_completed: false })
+        .select()
+        .single();
+      if (insErr) throw insErr;
+      return created;
+    },
+
+    async updateProfileFields(userId, fields) {
+      const { data, error } = await supabaseClient
+        .from(TABLES.PROFILES)
+        .update(fields)
+        .eq('id', userId)
+        .select()
+        .single();
+      if (error) throw error;
+      return data;
+    },
+
     async deleteExercise(exerciseId) {
       const { error } = await supabaseClient.from(TABLES.EXERCISES).delete().eq('id', exerciseId);
       if (error) throw error;
@@ -1947,6 +2097,10 @@ a{ color:inherit; }
   // NAVEGACIÓN ENTRE PÁGINAS (SPA)
   // ============================================================
   const pages = {
+    'auth-start': document.getElementById('page-auth-start'),
+    'auth-login': document.getElementById('page-auth-login'),
+    'auth-signup': document.getElementById('page-auth-signup'),
+    onboarding: document.getElementById('page-onboarding'),
     home: document.getElementById('page-home'),
     unit: document.getElementById('page-unit'),
     vocabulary: document.getElementById('page-vocabulary'),
@@ -1975,6 +2129,13 @@ a{ color:inherit; }
     if (name === 'profile') ProfileScreen.enter();
   }
 
+  document.getElementById('btnGoLogin').addEventListener('click', () => showPage('auth-login'));
+  document.getElementById('btnGoSignup').addEventListener('click', () => showPage('auth-signup'));
+  document.getElementById('btnBackFromLogin').addEventListener('click', () => showPage('auth-start'));
+  document.getElementById('btnBackFromSignup').addEventListener('click', () => showPage('auth-start'));
+  document.getElementById('btnGoSignupFromLogin').addEventListener('click', () => showPage('auth-signup'));
+  document.getElementById('btnGoLoginFromSignup').addEventListener('click', () => showPage('auth-login'));
+
   document.getElementById('btnGoAdmin').addEventListener('click', () => {
     // Si ya se autenticó en esta sesión del navegador, entra directo.
     if (sessionStorage.getItem(ADMIN_SESSION_KEY) === '1') {
@@ -1992,6 +2153,348 @@ a{ color:inherit; }
   document.querySelectorAll('.tab-bar-btn').forEach(btn => {
     btn.addEventListener('click', () => showPage(btn.dataset.tab));
   });
+  </script>
+
+  <script>
+  // ============================================================
+  // PUERTA DE ACCESO (login/onboarding) — v1.2-alpha
+  // Decide qué pantalla mostrar al abrir la app según si hay
+  // sesión activa y si el usuario ya completó el onboarding.
+  // ============================================================
+  const AuthGate = (() => {
+    let currentUser = null;
+
+    async function boot() {
+      try {
+        const { data: { session } } = await supabaseClient.auth.getSession();
+        if (!session) {
+          showPage('auth-start');
+          return;
+        }
+        await routeAfterAuth(session.user);
+      } catch (err) {
+        console.error('No se pudo verificar la sesión:', err);
+        showPage('auth-start');
+      }
+    }
+
+    async function routeAfterAuth(user) {
+      currentUser = user;
+      try {
+        const profile = await DataService.getOrCreateProfile(user);
+        if (!profile.onboarding_completed) {
+          OnboardingScreen.start(profile);
+          showPage('onboarding');
+        } else {
+          if (profile.name) ProfileService.setName(profile.name);
+          showPage('home');
+        }
+      } catch (err) {
+        console.error('No se pudo cargar el perfil:', err);
+        showPage('auth-start');
+      }
+    }
+
+    async function signOut() {
+      try { await supabaseClient.auth.signOut(); } catch (err) { console.error(err); }
+      currentUser = null;
+      showPage('auth-start');
+    }
+
+    function getCurrentUser() {
+      return currentUser;
+    }
+
+    return { boot, routeAfterAuth, signOut, getCurrentUser };
+  })();
+  </script>
+
+  <script>
+  // ============================================================
+  // PANTALLAS DE INICIO DE SESIÓN Y CREACIÓN DE CUENTA — v1.2-alpha
+  // ============================================================
+  (function setupAuthScreens() {
+    const loginEls = {
+      email: document.getElementById('inputLoginEmail'),
+      password: document.getElementById('inputLoginPassword'),
+      error: document.getElementById('loginError'),
+      submit: document.getElementById('btnLoginSubmit'),
+    };
+    const signupEls = {
+      email: document.getElementById('inputSignupEmail'),
+      password: document.getElementById('inputSignupPassword'),
+      confirm: document.getElementById('inputSignupPasswordConfirm'),
+      error: document.getElementById('signupError'),
+      submit: document.getElementById('btnSignupSubmit'),
+    };
+
+    function showError(el, message) {
+      el.textContent = message;
+      el.style.display = 'block';
+    }
+
+    loginEls.submit.addEventListener('click', async () => {
+      loginEls.error.style.display = 'none';
+      const email = loginEls.email.value.trim();
+      const password = loginEls.password.value;
+      if (!email || !password) return showError(loginEls.error, 'Ingresa tu correo y contraseña.');
+
+      loginEls.submit.disabled = true;
+      loginEls.submit.textContent = 'Ingresando…';
+      try {
+        const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
+        if (error) throw error;
+        await AuthGate.routeAfterAuth(data.user);
+      } catch (err) {
+        console.error(err);
+        showError(loginEls.error, 'Correo o contraseña incorrectos.');
+      } finally {
+        loginEls.submit.disabled = false;
+        loginEls.submit.textContent = 'Iniciar sesión';
+      }
+    });
+
+    signupEls.submit.addEventListener('click', async () => {
+      signupEls.error.style.display = 'none';
+      const email = signupEls.email.value.trim();
+      const password = signupEls.password.value;
+      const confirm = signupEls.confirm.value;
+
+      if (!email || !password) return showError(signupEls.error, 'Ingresa tu correo y contraseña.');
+      if (password.length < 6) return showError(signupEls.error, 'La contraseña debe tener al menos 6 caracteres.');
+      if (password !== confirm) return showError(signupEls.error, 'Las contraseñas no coinciden.');
+
+      signupEls.submit.disabled = true;
+      signupEls.submit.textContent = 'Creando cuenta…';
+      try {
+        const { data, error } = await supabaseClient.auth.signUp({ email, password });
+        if (error) throw error;
+
+        if (data.session && data.user) {
+          // Confirmación de correo desactivada: la sesión queda activa de inmediato.
+          await AuthGate.routeAfterAuth(data.user);
+        } else {
+          // Supabase requiere confirmar el correo antes de iniciar sesión.
+          showError(signupEls.error, '¡Cuenta creada! Revisa tu correo para confirmarla y luego inicia sesión.');
+          signupEls.error.style.color = 'var(--color-success)';
+        }
+      } catch (err) {
+        console.error(err);
+        showError(signupEls.error, err.message === 'User already registered'
+          ? 'Ese correo ya tiene una cuenta. Intenta iniciar sesión.'
+          : 'No se pudo crear la cuenta. Intenta de nuevo.');
+      } finally {
+        signupEls.submit.disabled = false;
+        signupEls.submit.textContent = 'Crear cuenta';
+      }
+    });
+  })();
+  </script>
+
+  <script>
+  // ============================================================
+  // ONBOARDING — cuestionario inicial tras crear la cuenta
+  // v1.2-alpha
+  // La sección de diagnóstico (actividades de evaluación) se
+  // omite por ahora: se agregará cuando existan esas actividades.
+  // ============================================================
+  const OnboardingScreen = (() => {
+    const AVATARS = ['#EC1D9C', '#1FA34C', '#7C3AED', '#2E7DF5', '#F5841F', '#E63946'];
+
+    const els = {
+      content: document.getElementById('onboardingContent'),
+      dots: document.getElementById('onboardingDots'),
+      back: document.getElementById('btnOnboardingBack'),
+    };
+
+    let profile = null;
+    let stepIndex = 0;
+    let answers = {};
+
+    const STEPS = [
+      { key: 'avatar', render: renderAvatarStep },
+      { key: 'name', render: renderNameStep },
+      { key: 'age', render: renderAgeStep },
+      { key: 'device', render: renderYesNoStep.bind(null, 'device', '¿Usas ya un dispositivo de apoyo para la audición?') },
+      { key: 'professional', render: renderYesNoStep.bind(null, 'professional', '¿Has consultado con un profesional?') },
+      { key: 'final', render: renderFinalStep },
+    ];
+
+    function start(existingProfile) {
+      profile = existingProfile;
+      stepIndex = 0;
+      answers = {
+        avatar: existingProfile.avatar || null,
+        name: existingProfile.name || '',
+        age: existingProfile.age || '',
+        device: existingProfile.uses_hearing_device,
+        professional: existingProfile.consulted_professional,
+      };
+      renderStep();
+    }
+
+    function renderDots() {
+      const total = STEPS.length - 1; // el paso final no cuenta como "pregunta"
+      els.dots.innerHTML = Array.from({ length: total }).map((_, i) => `
+        <span class="onboarding-dot ${i === stepIndex ? 'active' : ''} ${i < stepIndex ? 'done' : ''}"></span>
+      `).join('');
+      els.back.style.visibility = stepIndex === 0 ? 'hidden' : 'visible';
+    }
+
+    function renderStep() {
+      renderDots();
+      STEPS[stepIndex].render();
+    }
+
+    function goNext() {
+      if (stepIndex < STEPS.length - 1) {
+        stepIndex++;
+        renderStep();
+      }
+    }
+
+    function goBack() {
+      if (stepIndex > 0) {
+        stepIndex--;
+        renderStep();
+      }
+    }
+    els.back.onclick = goBack;
+
+    function wrapStep({ title, subtitle, bodyHtml, nextLabel = 'Siguiente', nextDisabled = false }) {
+      els.content.innerHTML = `
+        <div class="home-hero" style="margin-top:10px;">
+          <h1>${title}</h1>
+          ${subtitle ? `<p>${subtitle}</p>` : ''}
+        </div>
+        ${bodyHtml}
+        <button class="btn btn-primary" id="btnOnboardingNext" style="margin-top:18px;" ${nextDisabled ? 'disabled' : ''}>${nextLabel}</button>
+      `;
+    }
+
+    // --- Paso 1: Quién soy (elige un avatar) ---
+    function renderAvatarStep() {
+      wrapStep({
+        title: 'Quién soy',
+        subtitle: 'Elige un color para identificar tu perfil.',
+        bodyHtml: `
+          <div style="display:flex; flex-wrap:wrap; gap:14px; justify-content:center; padding:10px 0;">
+            ${AVATARS.map(color => `
+              <button class="avatar-option ${answers.avatar === color ? 'selected' : ''}" data-color="${color}" style="background:${color};"></button>
+            `).join('')}
+          </div>
+        `,
+        nextDisabled: !answers.avatar,
+      });
+
+      document.querySelectorAll('.avatar-option').forEach(btn => {
+        btn.addEventListener('click', () => {
+          answers.avatar = btn.dataset.color;
+          document.querySelectorAll('.avatar-option').forEach(b => b.classList.remove('selected'));
+          btn.classList.add('selected');
+          document.getElementById('btnOnboardingNext').disabled = false;
+        });
+      });
+      document.getElementById('btnOnboardingNext').addEventListener('click', goNext);
+    }
+
+    // --- Paso 2: ¿Cuál es tu nombre? ---
+    function renderNameStep() {
+      wrapStep({
+        title: '¿Cuál es tu nombre?',
+        bodyHtml: `<input type="text" id="onboardingName" class="onboarding-input" placeholder="Escribe tu nombre" maxlength="40" value="${answers.name || ''}" />`,
+        nextDisabled: !answers.name,
+      });
+
+      const input = document.getElementById('onboardingName');
+      input.addEventListener('input', () => {
+        answers.name = input.value.trim();
+        document.getElementById('btnOnboardingNext').disabled = !answers.name;
+      });
+      document.getElementById('btnOnboardingNext').addEventListener('click', goNext);
+    }
+
+    // --- Paso 3: ¿Qué edad tienes? ---
+    function renderAgeStep() {
+      wrapStep({
+        title: '¿Qué edad tienes?',
+        bodyHtml: `<input type="number" id="onboardingAge" class="onboarding-input" placeholder="Edad" min="1" max="120" value="${answers.age || ''}" />`,
+        nextDisabled: !answers.age,
+      });
+
+      const input = document.getElementById('onboardingAge');
+      input.addEventListener('input', () => {
+        answers.age = input.value;
+        document.getElementById('btnOnboardingNext').disabled = !answers.age;
+      });
+      document.getElementById('btnOnboardingNext').addEventListener('click', goNext);
+    }
+
+    // --- Pasos 4 y 5: preguntas de Sí/No ---
+    function renderYesNoStep(key, title) {
+      const current = answers[key];
+      wrapStep({
+        title,
+        bodyHtml: `
+          <div>
+            <button class="text-option ${current === true ? 'selected' : ''}" data-value="true">Sí</button>
+            <button class="text-option ${current === false ? 'selected' : ''}" data-value="false">No</button>
+          </div>
+        `,
+        nextDisabled: current === null || current === undefined,
+      });
+
+      document.querySelectorAll('#onboardingContent .text-option').forEach(btn => {
+        btn.addEventListener('click', () => {
+          answers[key] = btn.dataset.value === 'true';
+          document.querySelectorAll('#onboardingContent .text-option').forEach(b => b.classList.remove('selected'));
+          btn.classList.add('selected');
+          document.getElementById('btnOnboardingNext').disabled = false;
+        });
+      });
+      document.getElementById('btnOnboardingNext').addEventListener('click', goNext);
+    }
+
+    // --- Paso final: confirmación (el diagnóstico se agrega más adelante) ---
+    function renderFinalStep() {
+      els.dots.innerHTML = '';
+      els.back.style.visibility = 'hidden';
+      els.content.innerHTML = `
+        <div class="home-hero" style="margin-top:60px; text-align:center;">
+          <div class="name-gate-icon" style="margin:0 auto 10px;">${ICONS.checkCircle}</div>
+          <h1>¡Muy bien!</h1>
+          <p>Ya preparamos tu programa de entrenamiento. Puedes empezar a usar la plataforma.</p>
+        </div>
+        <button class="btn btn-primary" id="btnOnboardingFinish">Comenzar</button>
+      `;
+      document.getElementById('btnOnboardingFinish').addEventListener('click', finish);
+    }
+
+    async function finish() {
+      const btn = document.getElementById('btnOnboardingFinish');
+      btn.disabled = true;
+      btn.textContent = 'Guardando…';
+      try {
+        const updated = await DataService.updateProfileFields(profile.id, {
+          avatar: answers.avatar,
+          name: answers.name,
+          age: Number(answers.age) || null,
+          uses_hearing_device: answers.device,
+          consulted_professional: answers.professional,
+          onboarding_completed: true,
+        });
+        if (updated.name) ProfileService.setName(updated.name);
+        showPage('home');
+      } catch (err) {
+        console.error(err);
+        btn.disabled = false;
+        btn.textContent = 'Comenzar';
+        alert('No se pudo guardar tu información. Intenta de nuevo.');
+      }
+    }
+
+    return { start };
+  })();
   </script>
 
   <script>
@@ -2139,7 +2642,15 @@ a{ color:inherit; }
         <div class="badges-grid">
           ${BADGES.map(badge => renderBadge(badge, profile.badgeIds.includes(badge.id))).join('')}
         </div>
+
+        <div class="home-footer-link">
+          <a id="btnLogout">Cerrar sesión</a>
+        </div>
       `;
+
+      document.getElementById('btnLogout').addEventListener('click', () => {
+        if (confirm('¿Cerrar sesión?')) AuthGate.signOut();
+      });
     }
 
     function renderBadge(badge, unlocked) {
@@ -3356,51 +3867,13 @@ a{ color:inherit; }
 
   <script>
   // ============================================================
-  // MODAL DE BIENVENIDA — pregunta el nombre al entrar a la app
-  // Se muestra una sola vez, cuando todavía no hay un nombre
-  // guardado en el perfil. Si el usuario ya tiene nombre, no
-  // vuelve a preguntarse.
+  // ARRANQUE INICIAL — v1.2-alpha
+  // Revisa si hay sesión activa: si no la hay, muestra la
+  // bienvenida (Iniciar sesión / Crear cuenta). Si la hay, revisa
+  // si el onboarding está completo para decidir si continúa el
+  // cuestionario o entra directo al mapa de unidades.
   // ============================================================
-  (function initNameGate() {
-    const gate = document.getElementById('nameGate');
-    const input = document.getElementById('inputNameGate');
-    const btnContinue = document.getElementById('btnNameGateContinue');
-    const btnSkip = document.getElementById('btnNameGateSkip');
-
-    const profile = ProfileService.getProfile();
-    if (profile.name && profile.name.trim()) {
-      return; // ya tiene nombre guardado, no se pregunta de nuevo
-    }
-
-    gate.classList.add('show');
-    input.focus();
-
-    function confirmName() {
-      const value = input.value.trim();
-      if (!value) {
-        input.focus();
-        return;
-      }
-      ProfileService.setName(value);
-      gate.classList.remove('show');
-    }
-
-    btnContinue.addEventListener('click', confirmName);
-    input.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') confirmName();
-    });
-    btnSkip.addEventListener('click', () => {
-      gate.classList.remove('show');
-    });
-  })();
-  </script>
-
-  <script>
-  // ============================================================
-  // ARRANQUE INICIAL — renderiza el mapa de unidades al cargar
-  // la app (v1.1-alpha)
-  // ============================================================
-  HomeScreen.enter();
+  AuthGate.boot();
   </script>
 
 </body>
